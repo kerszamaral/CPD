@@ -28,11 +28,13 @@ int particiona(array_t array, int i, int f, loginfo_t &);
 void swap(int *n1, int *n2);
 void runs(int MAX, int type, bool display, loginfo_t *log);
 void displayArray(std::string &name, loginfo_t &loginfo);
+void combsort(array_t array, array_size_t array_size, loginfo_t &loginfo);
+void shakesort(array_t array, array_size_t array_size, loginfo_t &loginfo);
 
 std::string testNames[] = {"Crescente", "Aleatorio", "Decrescente"};
 std::string sortNames[] = {"Bubblesort", "Quicksort", "Shakesort", "Combsort"};
 
-#define TESTS 2 // quantidade de testes a serem executados
+#define TESTS 4 // quantidade de testes a serem executados
 #define RUNS 4  // quantidade de vezes que cada teste será executado
 
 int main(void)
@@ -48,9 +50,8 @@ int main(void)
 
         loginfo_t log[3][TESTS];
 
-        runs(MAX, 0, show, log[0]);
-        runs(MAX, 1, show, log[1]);
-        runs(MAX, 2, show, log[2]);
+        for (auto i = 0; i < 3; i++)
+            runs(MAX, i, show, log[i]);
 
         // TODO: armazenar essas informações em um matriz ou hashtable
         //! DONE
@@ -125,9 +126,9 @@ void runs(int MAX, int type, bool display, loginfo_t *log)
     case 5:
 
     case 4:
-
+        combsort(array[3], MAX, loginfo[3]);
     case 3:
-
+        shakesort(array[2], MAX, loginfo[2]);
     case 2:
         quicksort(array[1], 0, MAX - 1, loginfo[1]); // passa início e fim do trecho de processamento (MAX-1)
     case 1:
@@ -236,6 +237,87 @@ void bubblesort(array_t array, array_size_t array_size, loginfo_t &loginfo)
             }
         }
         qtd_elementos = pos_troca;
+    }
+
+    get<0>(loginfo) = trocas;
+    get<1>(loginfo) = comparacoes;
+    auto finish = std::chrono::steady_clock::now();
+    get<2>(loginfo) = finish - start;
+}
+
+void shakesort(array_t array, array_size_t array_size, loginfo_t &loginfo)
+{
+    auto start = std::chrono::steady_clock::now();
+
+    int trocas = 0;
+    int comparacoes = 0;
+    int pos_troca = 0;
+    bool troca = true;
+    int qtd_elementos = array_size - 1;
+
+    while (troca)
+    {
+        troca = false;
+        for (auto i = 0; i < qtd_elementos; i++)
+        {
+            comparacoes++;
+            if (array[i] > array[i + 1])
+            {
+                swap(array[i], array[i + 1]);
+                troca = true;
+                pos_troca = i;
+                trocas++;
+            }
+        }
+        qtd_elementos = pos_troca;
+        for (auto i = qtd_elementos; i > 0; i--)
+        {
+            comparacoes = comparacoes + 1;
+            if (array[i] < array[i - 1])
+            {
+                swap(array[i], array[i - 1]);
+                troca = true;
+                pos_troca = i;
+                trocas++;
+            }
+        }
+    }
+
+    get<0>(loginfo) = trocas;
+    get<1>(loginfo) = comparacoes;
+    auto finish = std::chrono::steady_clock::now();
+    get<2>(loginfo) = finish - start;
+}
+
+void combsort(array_t array, array_size_t array_size, loginfo_t &loginfo)
+{
+    auto start = std::chrono::steady_clock::now();
+
+    int trocas = 0;
+    int comparacoes = 0;
+    bool troca = true;
+    int qtd_elementos = array_size - 1;
+    int gap = qtd_elementos;
+
+    while (troca)
+    {
+        gap = floor(gap / 1.3);
+        if (gap < 1)
+        {
+            troca = false;
+            gap = 1;
+        }
+        
+        for (auto i = 0; i + gap <= qtd_elementos; i++)
+        {
+            comparacoes++;
+            if (array[i] > array[i + gap])
+            {
+                swap(array[i], array[i + gap]);
+                troca = true;
+                trocas++;
+            }
+        }
     }
 
     get<0>(loginfo) = trocas;
