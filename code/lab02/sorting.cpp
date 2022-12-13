@@ -12,13 +12,11 @@
 #include <bits/stdc++.h>
 #include <chrono>
 
-#define MAX 100 // quantidade de números no array
-
 using namespace std;
 
 typedef int array_size_t;               // Tipo para especificar tamanho do array
 typedef int *array_t;                   // Tipo para especificar formato do array
-typedef std::tuple<int, int> loginfo_t; // armazena contagem de <trocas , comparacoes>
+typedef std::tuple<int, int, std::chrono::duration<double>> loginfo_t; // armazena contagem de <trocas , comparacoes>
 typedef std::mt19937 MyRNG;             // Gerador de números aleatórios do tipo Mersenne Twister Random Generator
 
 MyRNG rng;         // gerador de números aleatórios
@@ -28,50 +26,140 @@ void bubblesort(array_t, array_size_t, loginfo_t &);
 void quicksort(array_t, int, int, loginfo_t &);
 int particiona(array_t array, int i, int f, loginfo_t &);
 void swap(int *n1, int *n2);
+void runs(int MAX, int type, bool display, loginfo_t *log);
+void displayArray(std::string &name, loginfo_t &loginfo);
+
+std::string testNames[] = {"Crescente", "Aleatorio", "Decrescente"};
+std::string sortNames[] = {"Bubblesort", "Quicksort", "Shakesort", "Combsort"};
+
+#define TESTS 2 // quantidade de testes a serem executados
+#define RUNS 4  // quantidade de vezes que cada teste será executado
 
 int main(void)
 {
-    // cout << __cplusplus << endl;                                             // verifica versão do compilador (descomente, se necessário avaliar)
-    rng.seed(seed_val);                             // inicializa semente de geração de números aleatórios
+    int MAX = 50; // quantidade de números no array
+    bool show = true;
+    // cout << __cplusplus << endl;                                             // verifica versão do compilador
+    rng.seed(seed_val); // inicializa semente de geração de números aleatórios
+
+    for (auto k = 0; k < RUNS; k++)
+    {
+        cout << endl << "Tamanho do Array testado: " << MAX << endl;
+
+        loginfo_t log[3][TESTS];
+
+        runs(MAX, 0, show, log[0]);
+        runs(MAX, 1, show, log[1]);
+        runs(MAX, 2, show, log[2]);
+
+        // TODO: armazenar essas informações em um matriz ou hashtable
+        //! DONE
+
+        for (auto i = 0; i < 3; i++)
+        {
+            // TODO: mostrar informações de execução de todos os algoritmos
+            //! DONE
+            cout << endl << "\tTeste " << testNames[i] << ":" << endl;
+            for(auto j = 0; j < TESTS; j++)
+                displayArray(sortNames[j], log[i][j]);
+        }
+
+        if (k == 0)
+        {
+            show = false;
+            MAX += 50;
+        }
+        else
+            MAX *= 10;
+    }
+
+    return 0;
+}
+
+void displayArray(std::string &name, loginfo_t &loginfo)
+{
+    cout << "\t\t" << name << ":" << endl;
+    cout << "\t\t\tQuantidade de trocas: " << get<0>(loginfo) << endl;
+    cout << "\t\t\tQuantidade de comparações: " << get<1>(loginfo) << endl;
+    cout << "\t\t\tTempo de execucao: " << get<2>(loginfo).count() << "s" << endl;
+}
+
+void runs(int MAX, int type, bool display, loginfo_t *log)
+{
     uniform_int_distribution<> distrib(0, INT_MAX); // cria gerador com distribuição uniforme entre 0 e MAX_INT
-    loginfo_t loginfo;                              // armazena contadores de comparações e trocas (ver typedef acima)
+    loginfo_t *loginfo = new loginfo_t[TESTS];      // armazena contadores de comparações e trocas (ver typedef acima)
 
-    int *array = new int[MAX]; // array dinâmico que armazena os números
+    int **array = new int *[TESTS]; // array dinâmico que armazena os números
+    for (int i = 0; i < TESTS; ++i)
+        array[i] = new int[MAX];
 
-    // for(auto i=0;i<MAX;i++) array[i] = MAX-i;                                 // gera números em ordem decrescente
-    for (auto i = 0; i < MAX; i++)
-        array[i] = i; // gera números em ordem crescente
+    // testar com as 3 versões de array (aleatório, crescente e decrescente):
+    if (type == 1)
+        for (auto i = 0; i < MAX; i++)
+            array[0][i] = distrib(rng); // gera números aleatórios para o array
+    else if (type == 2)
+        for (auto i = 0; i < MAX; i++)
+            array[0][i] = MAX - i; // gera números em ordem decrescente
+    else
+        for (auto i = 0; i < MAX; i++)
+            array[0][i] = i + 1; // gera números em ordem crescente
 
-    cout << "Array desordenado: ";
-    for (auto i = 0; i < MAX; i++)
-        cout << array[i] << " ";
+    for (auto j = 0; j < TESTS; j++)
+        for (auto i = 0; i < MAX; i++)
+            array[j][i] = array[0][i];
 
-    auto start = std::chrono::steady_clock::now();
-    bubblesort(array, MAX, loginfo); // passa tamanho do array
-    // quicksort(array, 0, MAX-1, loginfo);                                      // passa início e fim do trecho de processamento (MAX-1)
-    auto finish = std::chrono::steady_clock::now();
+    if (display)
+    {
+        cout << endl
+             << "Array gerado: ";
+        for (auto i = 0; i < MAX; i++)
+            cout << array[0][i] << " ";
+        cout << endl;
+    }
 
-    std::chrono::duration<double> elapsed_seconds = finish - start;
+    // TODO: testar os outros algoritmos (insertion_sortBB e shellsort)
+    //! DONE
 
-    // TODO: armazenar essas informações em um matriz, hashtable ou arquivo
+    switch (TESTS)
+    {
+    case 5:
 
-    cout << endl
-         << "Array ordenado: ";
-    for (auto i = 0; i < MAX; i++)
-        cout << array[i] << " ";
+    case 4:
 
-    cout << endl;
-    cout << "Quantidade de trocas: " << get<0>(loginfo) << endl;
-    cout << "Quantidade de comparações: " << get<1>(loginfo) << endl;
-    cout << "Tempo total: " << elapsed_seconds.count() << "s" << endl;
+    case 3:
+
+    case 2:
+        quicksort(array[1], 0, MAX - 1, loginfo[1]); // passa início e fim do trecho de processamento (MAX-1)
+    case 1:
+        bubblesort(array[0], MAX, loginfo[0]); // passa tamanho do array
+        break;
+    }
+
+    if (display)
+    {
+        for (auto j = 0; j < TESTS; j++)
+        {
+            cout << endl
+                 << "Array ordenado " << sortNames[j] << ": ";
+            for (auto i = 0; i < MAX; i++)
+                cout << array[j][i] << " ";
+            cout << endl;
+        }
+    }
+
+    for (auto i = 0; i < TESTS; i++)
+        delete[] array[i];
 
     delete[] array;
-    return 0;
+
+    for (auto i = 0; i < TESTS; i++)
+        log[i] = loginfo[i];
 }
 
 // Função de quicksort
 void quicksort(array_t array, int i, int f, loginfo_t &loginfo)
 {
+    auto start = std::chrono::steady_clock::now();
     int p;
     if (f > i)
     {
@@ -79,6 +167,8 @@ void quicksort(array_t array, int i, int f, loginfo_t &loginfo)
         quicksort(array, i, p - 1, loginfo);
         quicksort(array, p + 1, f, loginfo);
     }
+    auto finish = std::chrono::steady_clock::now();
+    get<2>(loginfo) = finish - start;
 }
 
 int particiona(array_t array, int esq, int dir, loginfo_t &loginfo)
@@ -123,6 +213,8 @@ void swap(int *n1, int *n2)
 
 void bubblesort(array_t array, array_size_t array_size, loginfo_t &loginfo)
 {
+    auto start = std::chrono::steady_clock::now();
+
     int trocas = 0;
     int comparacoes = 0;
     int pos_troca = 0;
@@ -148,4 +240,6 @@ void bubblesort(array_t array, array_size_t array_size, loginfo_t &loginfo)
 
     get<0>(loginfo) = trocas;
     get<1>(loginfo) = comparacoes;
+    auto finish = std::chrono::steady_clock::now();
+    get<2>(loginfo) = finish - start;
 }
