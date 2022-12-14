@@ -12,15 +12,17 @@ std::string testNames[] = {"Crescente", "Aleatorio", "Decrescente"}; // nomes do
 
 void displayFuncStats(SortFunctions_t sortFunctions[], loginfo_t loginfo[], int tests)
 {
-    std::cout << "\t\tFunction name"
-              << "\t|\tTrocas" << "\t|  Comparacoes" << "\t|\tTempo" << std::endl;
+    std::cout << "\tFunction name"
+              << "\t\t|\tTrocas" 
+              << "\t\t|\t  Comparacoes" 
+              << "\t\t|\tTempo" << std::endl;
     for (auto i = 0; i < tests; i++)
     {
-        std::cout 
-        << "\t\t" << std::get<1>(sortFunctions[i]) 
-        << "\t|\t" << std::get<0>(loginfo[i]) 
-        << "\t|\t" << std::get<1>(loginfo[i]) 
-        << "\t|\t" << std::get<2>(loginfo[i]).count() << "s" << std::endl;
+        std::cout
+            << "\t" << std::get<1>(sortFunctions[i])
+            << "\t\t|\t" << (float)std::get<0>(loginfo[i])
+            << "\t\t|\t\t" << (float)std::get<1>(loginfo[i])
+            << "\t\t|\t" << std::get<2>(loginfo[i]).count() << "s" << std::endl;
     }
 }
 
@@ -109,7 +111,7 @@ void runBatchTests(int NumberOfPasses, int NumberOfFunctionsToTest, array_size_t
         for (auto i = 0; i < 3; i++)
         {
             std::cout << std::endl 
-            << "\tTeste " << testNames[i] << " de tamanho " << InitialArraySize <<":" << std::endl; // exibe tipo de teste
+            << "Teste " << testNames[i] << " de tamanho " << InitialArraySize <<":" << std::endl; // exibe tipo de teste
             displayFuncStats(sortFunctions, log[i], NumberOfFunctionsToTest); // exibe contadores de comparações e trocas
         }
         ShowFirstArraySize = false;           // não mostra mais a primeira passada dos algoritmos
