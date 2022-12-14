@@ -15,10 +15,10 @@ void shakesort(array_t array, array_size_t array_size, loginfo_t &loginfo);
 
 SortFunctions_t sortFunctions[] =
 {
-        {bubblesort, "Bubblesort"},
-        {quicksortPoint, "Quicksort"},
-        {shakesort, "Shakesort"},
-        {combsort, "Combsort"}
+    {bubblesort, "Bubblesort"},
+    {quicksortPoint, "Quicksort"},
+    {shakesort, "Shakesort"},
+    {combsort, "Combsort"}
 };
 
 int main(void)
