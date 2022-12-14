@@ -1,5 +1,7 @@
 #include "./ian.hpp"
 
+#include <random>
+
 using namespace std;
 
 void bubblesort(array_t, array_size_t, loginfo_t &);
@@ -14,17 +16,17 @@ void shakesort(array_t array, array_size_t array_size, loginfo_t &loginfo);
 #define TESTS 4 // quantidade de testes a serem executados
 
 SortFunctions_t sortFunctions[] =
-{
-    {bubblesort, "Bubblesort"},
-    {quicksortPoint, "Quicksort"},
-    {shakesort, "Shakesort"},
-    {combsort, "Combsort"}
-};
+    {
+        {bubblesort, "Bubblesort"},
+        {quicksortPoint, "Quicksort"},
+        {shakesort, "Shakesort"},
+        {combsort, "Combsort"}
+        };
 
 int main(void)
 {
     // cout << __cplusplus << endl;                                             // verifica versão do compilador
-    
+
     runBatchTests(RUNS, TESTS, 100, sortFunctions);
 
     return 0;
