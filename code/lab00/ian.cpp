@@ -10,13 +10,18 @@ MyRNG rng;                                                           // gerador 
 uint32_t seed_val;                                                   // semente de geração de números
 std::string testNames[] = {"Crescente", "Aleatorio", "Decrescente"}; // nomes dos testes
 
-void displayArray(std::string &name, loginfo_t &loginfo)
+void displayFuncStats(SortFunctions_t sortFunctions[], loginfo_t loginfo[], int tests)
 {
-    std::cout
-        << "\t\t" << name << ":" << std::endl
-        << "\t\t\tQuantidade de trocas: " << std::get<0>(loginfo) << std::endl
-        << "\t\t\tQuantidade de comparações: " << std::get<1>(loginfo) << std::endl
-        << "\t\t\tTempo de execucao: " << std::get<2>(loginfo).count() << "s" << std::endl;
+    std::cout << "\t\tFunction name"
+              << "\t|\tTrocas" << "\t|  Comparacoes" << "\t|\tTempo" << std::endl;
+    for (auto i = 0; i < tests; i++)
+    {
+        std::cout 
+        << "\t\t" << std::get<1>(sortFunctions[i]) 
+        << "\t|\t" << std::get<0>(loginfo[i]) 
+        << "\t|\t" << std::get<1>(loginfo[i]) 
+        << "\t|\t" << std::get<2>(loginfo[i]).count() << "s" << std::endl;
+    }
 }
 
 void tests(SortFunctions_t sortFunctions[], int type, array_t array, array_size_t array_size, loginfo_t &loginfo)
@@ -89,32 +94,24 @@ void runs(SortFunctions_t sortFunctions[], int num_of_functions, array_size_t ar
 }
 
 // Executa os testes de ordenação, com o numero de passadas especificado
-// e o tamanho inicial do array, o qual é multiplicado por 100 toda a passada
+// e o tamanho inicial do array, o qual é multiplicado por 10 toda a passada
 // e o numero de funções de ordenação a serem testadas, as quais sao especificadas em sortFunctions
-void runBatchTests(int NumberOfPasses, int NumberOfFunctionsToTest, array_size_t InitialArraySize, SortFunctions_t sortFunctions[])
+void runBatchTests(int NumberOfPasses, int NumberOfFunctionsToTest, array_size_t InitialArraySize, bool ShowFirstArraySize, SortFunctions_t sortFunctions[])
 {
-    bool show = true; // Mostra a primeira passada dos algoritmos
-
-    for (auto k = 0; k < NumberOfPasses; k++)
+    for (auto k = 0; k < NumberOfPasses; k++, InitialArraySize *= 10)
     {
-        std::cout << std::endl
-                  << "Tamanho do Array testado: " << InitialArraySize << std::endl; // exibe tamanho do array
-
         loginfo_t log[3][NumberOfFunctionsToTest]; // armazena contadores de comparações e trocas (ver typedef acima)
 
 #pragma omp parallel for
         for (auto i = 0; i < 3; i++)
-            runs(sortFunctions, NumberOfFunctionsToTest, InitialArraySize, i, show, log[i]); // executa as funções de ordenação
+            runs(sortFunctions, NumberOfFunctionsToTest, InitialArraySize, i, ShowFirstArraySize, log[i]); // executa as funções de ordenação
 
         for (auto i = 0; i < 3; i++)
         {
-            std::cout << std::endl
-                      << "\tTeste " << testNames[i] << ":" << std::endl; // exibe tipo de teste
-            for (auto j = 0; j < NumberOfFunctionsToTest; j++)
-                displayArray(std::get<1>(sortFunctions[j]), log[i][j]); // exibe contadores de comparações e trocas
+            std::cout << std::endl 
+            << "\tTeste " << testNames[i] << " de tamanho " << InitialArraySize <<":" << std::endl; // exibe tipo de teste
+            displayFuncStats(sortFunctions, log[i], NumberOfFunctionsToTest); // exibe contadores de comparações e trocas
         }
-
-        InitialArraySize *= 10; // multiplica tamanho do array por 10
-        show = false;           // não mostra mais a primeira passada dos algoritmos
+        ShowFirstArraySize = false;           // não mostra mais a primeira passada dos algoritmos
     }
 }

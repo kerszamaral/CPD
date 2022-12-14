@@ -27,7 +27,7 @@ int main(void)
 {
     // cout << __cplusplus << endl;                                             // verifica versão do compilador
 
-    runBatchTests(RUNS, TESTS, 100, sortFunctions);
+    runBatchTests(RUNS, TESTS, 100, true, sortFunctions);
 
     return 0;
 }
