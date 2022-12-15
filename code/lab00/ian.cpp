@@ -62,9 +62,7 @@ void tests(SortFunctions_t sortFunctions[], int type, array_t array, array_size_
 void runs(SortFunctions_t sortFunctions[], int num_of_functions, array_size_t array_size, int type, bool display, loginfo_t *log)
 {
     rng.seed(seed_val); // inicializa semente de geração de números aleatórios
-
     std::uniform_int_distribution<> distrib(0, INT_MAX);  // cria gerador com distribuição uniforme entre 0 e MAX_INT
-    loginfo_t *loginfo = new loginfo_t[num_of_functions]; // armazena contadores de comparações e trocas (ver typedef acima)
 
     int **array = new int *[num_of_functions]; // array dinâmico que armazena os números
     for (int i = 0; i < num_of_functions; ++i)
@@ -96,7 +94,7 @@ void runs(SortFunctions_t sortFunctions[], int num_of_functions, array_size_t ar
 
 #pragma omp parallel for
     for (auto i = 0; i < num_of_functions; i++)
-        tests(sortFunctions, i, array[i], array_size, loginfo[i]); // executa as funções de ordenação
+        tests(sortFunctions, i, array[i], array_size, log[i]); // executa as funções de ordenação
 
     if (display && type != 1 && array_size <= 100)
     {
@@ -110,14 +108,10 @@ void runs(SortFunctions_t sortFunctions[], int num_of_functions, array_size_t ar
         }
     }
 
-#pragma omp parallel for
+// #pragma omp parallel for
     for (auto i = 0; i < num_of_functions; i++)
         delete[] array[i];
     delete[] array;
-
-#pragma omp parallel for
-    for (auto i = 0; i < num_of_functions; i++)
-        log[i] = loginfo[i]; // armazena contadores de comparações e trocas
 }
 
 // Executa os testes de ordenação, com o numero de passadas especificado
@@ -125,54 +119,61 @@ void runs(SortFunctions_t sortFunctions[], int num_of_functions, array_size_t ar
 // e o numero de funções de ordenação a serem testadas, as quais sao especificadas em sortFunctions
 void runBatchTests(bool automatic, int NumberOfPasses, int NumberOfFunctionsToTest, array_size_t InitialArraySize, bool ShowFirstArraySize, SortFunctions_t sortFunctions[])
 {
-    int arraySizes[NumberOfPasses] = {InitialArraySize}; // armazena o tamanho dos arrays de cada passada
-    for (auto i = 1; i < NumberOfPasses; i++)
-        arraySizes[i] = arraySizes[i - 1] * 10; // calcula o tamanho dos arrays de cada passada
+    int *arraySizes = new int[NumberOfPasses]; // armazena o tamanho dos arrays de cada passada
+    arraySizes[0] = InitialArraySize;
 
-    loginfo_t log[NumberOfPasses][3][NumberOfFunctionsToTest]; // armazena contadores de comparações e trocas (ver typedef acima)
+    loginfo_t ***log = new loginfo_t**[NumberOfPasses]; // armazena contadores de comparações e trocas (ver typedef acima)
+
+    for (auto i = 0; i < NumberOfPasses; i++)
+    {
+        if (i > 0)
+            arraySizes[i] = arraySizes[i - 1] * 10; // calcula o tamanho dos arrays de cada passada
+
+        log[i] = new loginfo_t*[3]; // aloca espaço para cada função de ordenação
+        for (int j = 0; j < 3; ++j)
+            log[i][j] = new loginfo_t[NumberOfFunctionsToTest]; // aloca espaço para cada função de ordenação
+    }
 
 #pragma omp parallel for
-    for (auto k = 0; k < NumberOfPasses; k++)
+    for (auto i = 0; i < NumberOfPasses; i++)
     {
 #pragma omp parallel for
-        for (auto i = 0; i < 3; i++)
-            runs(sortFunctions, NumberOfFunctionsToTest, arraySizes[k], i, ShowFirstArraySize, log[k][i]); // executa as funções de ordenação
+        for (auto j = 0; j < 3; j++)
+            runs(sortFunctions, NumberOfFunctionsToTest, arraySizes[i], j, ShowFirstArraySize, log[i][j]); // executa as funções de ordenação
         ShowFirstArraySize = false;                                                                        // não mostra mais a primeira passada dos algoritmos
     }
 
-    int x = 0;
+    int outputMode = 1;
 
     if (!automatic)
     {
         std::cout << std::endl
-                  << "Entre com o modo de saida" << std::endl
                   << "1 - Saida Terminal" << std::endl
                   << "2 - Saida Arquivo" << std::endl
-                  << "3 - Saida CSV" << std::endl;
+                  << "3 - Saida CSV" << std::endl
+                  << "Entre com o modo de saida: ";
 
-        std::cin >> x; // espera o usuário pressionar enter para exibir os resultados
-    }
-    else
-    {
-        x = 1;
+        std::cin >> outputMode;
     }
 
-    if (x == 1)
+    switch (outputMode)
     {
+    case 1:
         for (auto k = 0; k < NumberOfPasses; k++)
             for (auto i = 0; i < 3; i++)
                 displayFuncStats(std::cout, sortFunctions, log[k][i], NumberOfFunctionsToTest, testNames[i], arraySizes[k]); // exibe contadores de comparações e trocas
-    }
-    else if (x == 2)
+        break;
+    case 2:
     {
         std::ofstream myFile;
         myFile.open("saida.txt");
         for (auto k = 0; k < NumberOfPasses; k++)
             for (auto i = 0; i < 3; i++)
-                displayFuncStats(myFile, sortFunctions, log[k][i], NumberOfFunctionsToTest, testNames[i], arraySizes[k]); // exibe contadores de comparações e trocas
+                displayFuncStats(myFile, sortFunctions, log[k][i], NumberOfFunctionsToTest, testNames[i], arraySizes[k]);
         myFile.close();
+        break;
     }
-    else if (x == 3)
+    case 3:
     {
         std::ofstream myFile;
         myFile.open("saida.csv");
@@ -180,17 +181,27 @@ void runBatchTests(bool automatic, int NumberOfPasses, int NumberOfFunctionsToTe
             for (auto i = 0; i < 3; i++)
                 displayFuncStatsCSV(myFile, sortFunctions, log[k][i], NumberOfFunctionsToTest, testNames[i], arraySizes[k]);
         myFile.close();
+        break;
     }
-    else
-    {
+    default:
         std::cout << "Modo de saida invalido" << std::endl;
+        break;
     }
 
     if (!automatic)
     {
         std::cout << std::endl
-                  << "Dados prontos! Pressione enter para sair" << std::endl;
+                  << "Dados prontos! Pressione enter para sair";
         std::cin.ignore();
         std::cin.get();
     }
+
+    delete[] arraySizes;
+    for (auto i = 0; i < NumberOfPasses; i++)
+    {
+        for (int j = 0; j < 3; ++j)
+            delete[] log[i][j];
+        delete[] log[i];
+    }
+    delete[] log;
 }
