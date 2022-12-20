@@ -1,8 +1,12 @@
-#include "./ian.hpp"
+#include "cpd.hpp"
 
 #include <random>
 
 using namespace std;
+
+typedef int array_size_t;                                              // Tipo para especificar tamanho do array
+typedef int *array_t;                                                  // Tipo para especificar formato do array
+typedef std::tuple<int, int, std::chrono::duration<double>> loginfo_t; // armazena contagem de <trocas , comparacoes>
 
 void bubblesort(array_t, array_size_t, loginfo_t &);
 void quicksortPoint(array_t, array_size_t, loginfo_t &);
@@ -15,7 +19,7 @@ void shakesort(array_t array, array_size_t array_size, loginfo_t &loginfo);
 #define RUNS 3  // quantidade de vezes que cada teste será executado
 #define TESTS 4 // quantidade de testes a serem executados
 
-SortFunctions_t sortFunctions[] =
+cpd::SortFunctions_t sortFunctions[] =
     {
         {bubblesort, "Bubblesort"},
         {quicksortPoint, "Quicksort"},
@@ -27,7 +31,7 @@ int main(void)
 {
     // cout << __cplusplus << endl;                                             // verifica versão do compilador
 
-    runBatchTests(false, RUNS, TESTS, 100, true, sortFunctions);
+    cpd::runBatchTests(false, RUNS, TESTS, 100, true, sortFunctions);
 
     return 0;
 }
