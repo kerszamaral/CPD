@@ -31,7 +31,7 @@ int main(void)
 {
     // cout << __cplusplus << endl;                                             // verifica versão do compilador
 
-    cpd::runBatchTests(false, RUNS, TESTS, 100, true, sortFunctions);
+    cpd::runBatchTests(false, RUNS, sortFunctions, TESTS, 100);
 
     return 0;
 }

@@ -21,5 +21,5 @@ namespace cpd
     // Executa os testes de ordenação, com o numero de passadas especificado
     // e o tamanho inicial do array, o qual é multiplicado por 100 toda a passada
     // e o numero de funções de ordenação a serem testadas, as quais sao especificadas em sortFunctions
-    void runBatchTests(bool automatic, int NumberOfPasses, int NumberOfFunctionsToTest, array_size_t InitialArraySize, bool ShowFirstArraySize, SortFunctions_t sortFunctions[]);
+    void runBatchTests(bool automatic, size_t Passes, SortFunctions_t Sorts[], size_t FunctionsToTest, array_size_t Initial);
 } // namespace CPD
