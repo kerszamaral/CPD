@@ -23,10 +23,10 @@ int main(void)
     // cout << __cplusplus << endl;                                             // verifica versão do compilador
 
     cpd::Tester<cpd::SortFunctions_t> tester = cpd::Tester(
-        {cpd::make_tuple(bubblesort, "Bubblesort"),
-         cpd::make_tuple(quicksortPoint, "Quicksort"),
-         cpd::make_tuple(shakesort, "Shakesort"),
-         cpd::make_tuple(combsort, "Combsort")}); // instancia o objeto de teste
+        {cpd::pair(bubblesort, "Bubblesort"),
+         cpd::pair(quicksortPoint, "Quicksort"),
+         cpd::pair(shakesort, "Shakesort"),
+         cpd::pair(combsort, "Combsort")}); // instancia o objeto de teste
 
     tester.BatchTests(false, RUNS, 100); // executa os testes (automatico, funções de ordenação, tamanho inicial do array
 

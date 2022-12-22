@@ -24,11 +24,11 @@ namespace cpd
     typedef std::chrono::duration<double> timer;                     // Tipo para especificar o timer do programa
     typedef std::tuple<int, int, timer> loginfo_t;                   // armazena contagem de <trocas , comparacoes, tempo de execucao>
     typedef void (*Functions_t)(array_t, array_size_t, loginfo_t &); // Tipo para especificar funções de ordenação
-    typedef std::tuple<Functions_t, std::string> SortFunctions_t;    // Tipo para especificar funções de ordenação e seus nomes
+    typedef std::pair<Functions_t, std::string> SortFunctions_t;     // Tipo para especificar funções de ordenação e seus nomes
 
-    SortFunctions_t make_tuple(Functions_t func, std::string name)
+    SortFunctions_t pair(Functions_t func, std::string name)
     {
-        return std::make_tuple(func, name);
+        return std::make_pair(func, name);
     }
 
     template <class Type>
@@ -168,13 +168,14 @@ namespace cpd
             }
 
             int outputMode = 1;
-
             if (!automatic)
             {
+                std::cout.flush();
                 std::cout << std::endl
-                          << "1 - Saida Terminal" << std::endl
-                          << "2 - Saida Arquivo" << std::endl
-                          << "3 - Saida CSV" << std::endl
+                          << "Testes Concluidos!" << std::endl
+                          << "1 - Terminal" << std::endl
+                          << "2 - TXT" << std::endl
+                          << "3 - CSV" << std::endl
                           << "Entre com o modo de saida: ";
 
                 std::cin >> outputMode;
