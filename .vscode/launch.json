@@ -28,7 +28,7 @@
             ],
             "windows": {
                 "program": "${fileDirname}/${fileBasenameNoExtension}.exe",
-                "externalConsole": true,
+                "externalConsole": false,
                 "preLaunchTask": "gpp build active file windows",
             },
             "linux": {
