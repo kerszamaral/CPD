@@ -16,22 +16,19 @@ void swap(int *n1, int *n2);
 void combsort(array_t array, array_size_t array_size, loginfo_t &loginfo);
 void shakesort(array_t array, array_size_t array_size, loginfo_t &loginfo);
 
-#define RUNS 3  // quantidade de vezes que cada teste será executado
-#define TESTS 4 // quantidade de testes a serem executados
-
-cpd::SortFunctions_t sortFunctions[] =
-    {
-        {bubblesort, "Bubblesort"},
-        {quicksortPoint, "Quicksort"},
-        {shakesort, "Shakesort"},
-        {combsort, "Combsort"}
-        };
+#define RUNS 3 // quantidade de vezes que cada teste será executado
 
 int main(void)
 {
     // cout << __cplusplus << endl;                                             // verifica versão do compilador
 
-    cpd::runBatchTests(false, RUNS, sortFunctions, TESTS, 100);
+    cpd::Tester<cpd::SortFunctions_t> tester = cpd::Tester(
+        {cpd::make_tuple(bubblesort, "Bubblesort"),
+         cpd::make_tuple(quicksortPoint, "Quicksort"),
+         cpd::make_tuple(shakesort, "Shakesort"),
+         cpd::make_tuple(combsort, "Combsort")}); // instancia o objeto de teste
+
+    tester.BatchTests(false, RUNS, 100); // executa os testes (automatico, funções de ordenação, tamanho inicial do array
 
     return 0;
 }
@@ -44,7 +41,6 @@ void quicksortPoint(array_t array, array_size_t array_size, loginfo_t &loginfo)
 // Função de quicksort
 void quicksort(array_t array, int i, int f, loginfo_t &loginfo)
 {
-    auto start = std::chrono::steady_clock::now();
     int p;
     if (f > i)
     {
@@ -52,8 +48,6 @@ void quicksort(array_t array, int i, int f, loginfo_t &loginfo)
         quicksort(array, i, p - 1, loginfo);
         quicksort(array, p + 1, f, loginfo);
     }
-    auto finish = std::chrono::steady_clock::now();
-    get<2>(loginfo) = finish - start;
 }
 
 int particiona(array_t array, int esq, int dir, loginfo_t &loginfo)
