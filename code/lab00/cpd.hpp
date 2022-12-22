@@ -44,7 +44,7 @@ namespace cpd
         void displayStats(std::ostream &output, std::string separator, loginfo_t loginfo[], std::string testName, array_size_t S)
         {
             output << std::endl
-                   << "Teste " << testName << separator << "Tamanho " << S << ":" << std::endl // exibe tipo de teste
+                   << std::setw(CHARWIDTH) << testName << separator << "Tamanho " << S << ":" << std::endl // exibe tipo de teste
                    << std::setw(CHARWIDTH) << "Nome da funcao"
                    << separator << std::setw(CHARWIDTH) << "Trocas"
                    << separator << std::setw(CHARWIDTH) << "Comparacoes"
