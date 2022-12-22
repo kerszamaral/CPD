@@ -22,7 +22,7 @@ namespace cpd
     typedef int array_size_t;                                        // Tipo para especificar tamanho do array
     typedef int *array_t;                                            // Tipo para especificar formato do array
     typedef std::chrono::duration<double> timer;                     // Tipo para especificar o timer do programa
-    typedef std::tuple<int, int, timer> loginfo_t;                   // armazena contagem de <trocas , comparacoes, tempo de execucao>
+    typedef std::tuple<size_t, size_t, timer> loginfo_t;                   // armazena contagem de <trocas , comparacoes, tempo de execucao>
     typedef void (*Functions_t)(array_t, array_size_t, loginfo_t &); // Tipo para especificar funções de ordenação
     typedef std::pair<Functions_t, std::string> SortFunctions_t;     // Tipo para especificar funções de ordenação e seus nomes
 

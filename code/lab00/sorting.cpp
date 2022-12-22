@@ -6,7 +6,7 @@ using namespace std;
 
 typedef int array_size_t;                                              // Tipo para especificar tamanho do array
 typedef int *array_t;                                                  // Tipo para especificar formato do array
-typedef std::tuple<int, int, std::chrono::duration<double>> loginfo_t; // armazena contagem de <trocas , comparacoes>
+typedef std::tuple<size_t, size_t, std::chrono::duration<double>> loginfo_t; // armazena contagem de <trocas , comparacoes>
 
 void bubblesort(array_t, array_size_t, loginfo_t &);
 void quicksortPoint(array_t, array_size_t, loginfo_t &);
