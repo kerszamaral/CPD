@@ -58,9 +58,9 @@ namespace cpd
     private:
         void testTimer(FuncType sort, array_t A, array_size_t S, LogType &loginfo, Timer &time) // função para testar tempo de execução
         {
-            time.Start();                     // inicia timer
-            TestExecute(sort, A, S, loginfo); // executa função de ordenação
-            time.Stop();                      // para timer
+            time.Start();                      // inicia timer
+            TestFunction(sort, A, S, loginfo); // executa função de ordenação
+            time.Stop();                       // para timer
         }
 
         void runs(array_size_t Array_Size, int TestType, LogType log[], Timer Timers[])
@@ -116,7 +116,7 @@ namespace cpd
             delete[] array;
         }
 
-        void Output(bool &Automatic, int &Passes, LogType **log[], int arraySizes[], Timer **timers[])
+        void output(bool &Automatic, int &Passes, LogType **log[], int arraySizes[], Timer **timers[])
         {
             int outputMode = 0;
             std::ostream *out = &std::cout; // ponteiro para stream de saída
@@ -158,7 +158,7 @@ namespace cpd
 
             for (auto i = 0; i < Passes; i++)
                 for (auto j = 0; j < 3; j++)
-                    displayStats(*out, separator, log[i][j], testNames[j], arraySizes[i], timers[i][j]); // exibe contadores de comparações e trocas
+                    DisplayStats(*out, separator, log[i][j], testNames[j], arraySizes[i], timers[i][j]); // exibe contadores de comparações e trocas
 
             if (!Automatic)
             {
@@ -198,12 +198,12 @@ namespace cpd
             FuncNames.clear(); // limpa vetor de nomes de funções de ordenação
         }
 
-        void virtual TestExecute(FuncType sort, array_t A, array_size_t S, LogType &loginfo) // função de execução de teste
+        void virtual TestFunction(FuncType sort, array_t A, array_size_t S, LogType &loginfo) // função de execução de teste
         {
             sort(A, S, loginfo); // executa função de ordenação;
         }
 
-        void virtual displayStats(std::ostream &output, std::string separator, LogType loginfo[], std::string testName, array_size_t S, Timer Timers[])
+        void virtual DisplayStats(std::ostream &output, std::string separator, LogType loginfo[], std::string testName, array_size_t S, Timer Timers[])
         {
             output << std::endl
                    << std::setw(CHARWIDTH) << testName << separator << "Tamanho " << S << ":" << std::endl // exibe tipo de teste
@@ -253,7 +253,7 @@ namespace cpd
                     runs(arraySizes[i], j, log[i][j], timers[i][j]); // executa as funções de ordenação                                                                  // não mostra mais a primeira passada dos algoritmos
             }
 
-            Output(automatic, Passes, log, arraySizes, timers); // exibe os resultados
+            output(automatic, Passes, log, arraySizes, timers); // exibe os resultados
 
             for (int i = 0; i < Passes; i++)
             {
