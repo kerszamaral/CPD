@@ -6,89 +6,85 @@ Header para os trabalhos de laboratório de CPD
 #pragma once
 
 #include <iostream>
-#include <array>
 #include <vector>
 #include <tuple>
 #include <chrono>
 #include <random>
-#include <climits>
 #include <cstring>
 #include <iomanip>
 #include <fstream>
-#define CHARWIDTH 14
 
 namespace cpd
 {
-    typedef int array_size_t;                                        // Tipo para especificar tamanho do array
-    typedef int *array_t;                                            // Tipo para especificar formato do array
-    typedef std::chrono::duration<double> timer;                     // Tipo para especificar o timer do programa
-    typedef std::tuple<size_t, size_t, timer> loginfo_t;                   // armazena contagem de <trocas , comparacoes, tempo de execucao>
-    typedef void (*Functions_t)(array_t, array_size_t, loginfo_t &); // Tipo para especificar funções de ordenação
-    typedef std::pair<Functions_t, std::string> SortFunctions_t;     // Tipo para especificar funções de ordenação e seus nomes
+    typedef size_t array_size_t; // Tipo para especificar tamanho do array
+    typedef int *array_t;        // Tipo para especificar formato do array
 
-    SortFunctions_t pair(Functions_t func, std::string name)
+    class Timer // classe para medir tempo de execução
     {
-        return std::make_pair(func, name);
-    }
+    private:
+        std::chrono::time_point<std::chrono::steady_clock> start, end;                   // variáveis para armazenar tempo inicial e final
+        std::chrono::duration<double> _duration = std::chrono::duration<double>::zero(); // variável para armazenar duração
 
-    template <class Type>
-    class Tester
+    public:
+        void Start()
+        {
+            start = std::chrono::steady_clock::now();
+        }
+
+        void Stop()
+        {
+            auto end = std::chrono::steady_clock::now();
+            _duration = end - start;
+        }
+
+        const std::chrono::duration<double> &Duration()
+        {
+            return _duration; // retorna duração
+        }
+    };
+
+    template <typename FuncType, typename LogType>
+    class Tester // classe para testar funções de ordenação
     {
+    private:
         std::mt19937 rng;                                                     // gerador de números aleatórios
         uint32_t seed_val;                                                    // semente de geração de números
         std::string testNames[3] = {"Crescente", "Aleatorio", "Decrescente"}; // nomes dos testes
-        std::vector<Type> sortFunctions;                                      // array de funções de ordenação
-        size_t Size;                                                          // tamanho do array de funções de ordenação
+        const int CHARWIDTH = 14;                                             // largura de caracteres para exibição de dados
+        std::vector<FuncType> Functions;                                      // array de funções de ordenação
+        int Size;                                                             // tamanho do array de funções de ordenação
+        std::vector<std::string> FuncNames;                                   // array de nomes das funções de ordenação
 
     private:
-        void displayStats(std::ostream &output, std::string separator, loginfo_t loginfo[], std::string testName, array_size_t S)
+        void testTimer(FuncType sort, array_t A, array_size_t S, LogType &loginfo, Timer &time) // função para testar tempo de execução
         {
-            output << std::endl
-                   << std::setw(CHARWIDTH) << testName << separator << "Tamanho " << S << ":" << std::endl // exibe tipo de teste
-                   << std::setw(CHARWIDTH) << "Nome da funcao"
-                   << separator << std::setw(CHARWIDTH) << "Trocas"
-                   << separator << std::setw(CHARWIDTH) << "Comparacoes"
-                   << separator << std::setw(CHARWIDTH) << "Tempo" << std::endl;
-            for (size_t i = 0; i < Size; i++)
-            {
-                output
-                    << std::setw(CHARWIDTH) << std::get<1>(sortFunctions[i])
-                    << separator << std::setw(CHARWIDTH) << std::get<0>(loginfo[i])
-                    << separator << std::setw(CHARWIDTH) << std::get<1>(loginfo[i])
-                    << separator << std::setw(CHARWIDTH) << std::get<2>(loginfo[i]).count() << "s" << std::endl;
-            }
+            time.Start();                     // inicia timer
+            TestExecute(sort, A, S, loginfo); // executa função de ordenação
+            time.Stop();                      // para timer
         }
 
-        void testTimer(Type sort, array_t A, array_size_t S, loginfo_t &loginfo)
-        {
-            auto start = std::chrono::high_resolution_clock::now(); // inicia timer
-            std::get<0>(sort)(A, S, loginfo);                       // executa função de ordenação
-            auto end = std::chrono::high_resolution_clock::now();   // finaliza timer
-            std::get<2>(loginfo) = end - start;                     // armazena tempo de execução
-        }
-
-        void runs(array_size_t S, int T, loginfo_t *log)
+        void runs(array_size_t Array_Size, int TestType, LogType log[], Timer Timers[])
         {
             std::uniform_int_distribution<> distrib(0, INT_MAX); // cria gerador com distribuição uniforme entre 0 e MAX_INT
 
             int **array = new int *[Size]; // array dinâmico que armazena os números
-            for (size_t i = 0; i < Size; ++i)
-                array[i] = new int[S]; // aloca espaço para cada função de ordenação
+            for (auto i = 0; i < Size; ++i)
+                array[i] = new int[Array_Size]; // aloca espaço para cada função de ordenação
 
             // testar com as 3 versões de array (aleatório, crescente e decrescente):
-            switch (T)
+            switch (TestType)
             {
             case 0:
-                for (auto i = 0; i < S; i++)
+                for (size_t i = 0; i < Array_Size; i++)
                     array[0][i] = i + 1; // gera números em ordem crescente
                 break;
             case 1:
-                for (auto i = 0; i < S; i++)
+                for (size_t i = 0; i < Array_Size; i++)
                     array[0][i] = distrib(Tester::rng); // gera números aleatórios para o array
                 break;
             case 2:
-                for (auto i = 0; i < S; i++)
-                    array[0][i] = S - i; // gera números em ordem decrescente
+                for (size_t i = 0; i < Array_Size; i++)
+                    array[0][i] = Array_Size - i; // gera números em ordem decrescente
                 break;
             default:
                 std::cout << "Tipo de array inválido" << std::endl;
@@ -96,81 +92,40 @@ namespace cpd
             }
 
 #pragma omp parallel for
-            for (size_t i = 0; i < Size; i++)
-                std::memmove(array[i], array[0], S * sizeof(int)); // copia array gerado para os outros arrays
+            for (auto i = 0; i < Size; i++)
+                std::memmove(array[i], array[0], Array_Size * sizeof(int)); // copia array gerado para os outros arrays
 
 #pragma omp parallel for
-            for (size_t i = 0; i < Size; i++)
-                testTimer(sortFunctions[i], array[i], S, log[i]); // executa as funções de ordenação
+            for (auto i = 0; i < Size; i++)
+                testTimer(Functions[i], array[i], Array_Size, log[i], Timers[i]); // executa as funções de ordenação
 
-            if (T != 1 && S <= 100)
+            if (TestType != 1 && Array_Size <= 100)
             {
-                for (size_t j = 0; j < Size; j++)
+                for (auto j = 0; j < Size; j++)
                 {
                     std::cout << std::endl
-                              << "Array " << Tester::testNames[T] << " Ordenado pelo " << std::get<1>(sortFunctions[j]) << ":" << std::endl; // exibe array ordenado
-                    for (auto i = 0; i < S; i++)
+                              << "Array " << Tester::testNames[TestType] << " Ordenado pelo " << FuncNames[j] << ":" << std::endl; // exibe array ordenado
+                    for (size_t i = 0; i < Array_Size; i++)
                         std::cout << array[j][i] << " ";
                     std::cout << std::endl;
                 }
             }
 
-            for (size_t i = 0; i < Size; i++)
+            for (auto i = 0; i < Size; i++)
                 delete[] array[i];
             delete[] array;
         }
 
-    public:
-        Tester(std::initializer_list<Type> functions) : Tester(std::vector<Type>(functions))
+        void Output(bool &Automatic, int &Passes, LogType **log[], int arraySizes[], Timer **timers[])
         {
-            sortFunctions = functions;
-            Size = functions.size();
-            rng.seed(seed_val); // inicializa semente de geração de números aleatórios
-        }
+            int outputMode = 0;
+            std::ostream *out = &std::cout; // ponteiro para stream de saída
+            std::ofstream myFile;           // arquivo de saída
+            std::string separator = " | ";  // separador de colunas
 
-        Tester(std::vector<Type> functions)
-        {
-            sortFunctions = functions;
-            Size = functions.size();
-            rng.seed(seed_val); // inicializa semente de geração de números aleatórios
-        }
-
-        ~Tester()
-        {
-            sortFunctions.clear();
-        }
-
-        // Executa os testes de ordenação, com o numero de passadas especificado
-        // e o tamanho inicial do array, o qual é multiplicado por 10 toda a passada
-        // e o numero de funções de ordenação a serem testadas, as quais sao especificadas em sortFunctions
-        void BatchTests(bool automatic, size_t Passes, array_size_t Initial)
-        {
-            int *arraySizes = new int[Passes]; // armazena o tamanho dos arrays de cada passada
-            arraySizes[0] = Initial;
-            loginfo_t ***log = new loginfo_t **[Passes]; // armazena contadores de comparações e trocas (ver typedef acima)
-
-            for (size_t i = 0; i < Passes; i++)
+            if (!Automatic) // se modo automático não estiver ativado
             {
-                if (i > 0)
-                    arraySizes[i] = arraySizes[i - 1] * 10; // calcula o tamanho dos arrays de cada passada
-
-                log[i] = new loginfo_t *[3]; // aloca espaço para cada função de ordenação
-                for (int j = 0; j < 3; ++j)
-                    log[i][j] = new loginfo_t[Size]; // aloca espaço para cada função de ordenação
-            }
-
-#pragma omp parallel for
-            for (size_t i = 0; i < Passes; i++)
-            {
-#pragma omp parallel for
-                for (size_t j = 0; j < 3; j++)
-                    runs(arraySizes[i], j, log[i][j]); // executa as funções de ordenação                                                                  // não mostra mais a primeira passada dos algoritmos
-            }
-
-            int outputMode = 1;
-            if (!automatic)
-            {
-                std::cout.flush();
+                std::cout.flush(); // limpa buffer de saída
                 std::cout << std::endl
                           << "Testes Concluidos!" << std::endl
                           << "1 - Terminal" << std::endl
@@ -178,59 +133,141 @@ namespace cpd
                           << "3 - CSV" << std::endl
                           << "Entre com o modo de saida: ";
 
-                std::cin >> outputMode;
+                std::cin >> outputMode; // lê modo de saída
+                while (outputMode < 1 || outputMode > 3)
+                {
+                    switch (outputMode)
+                    {
+                    case 1:
+                        break;
+                    case 2:
+                        myFile.open("saida.txt"); // abre arquivo de saída
+                        out = &myFile;            // aponta ponteiro para stream de saída para o arquivo
+                        break;
+                    case 3:
+                        myFile.open("saida.csv"); // abre arquivo de saída
+                        out = &myFile;            // aponta ponteiro para stream de saída para o arquivo
+                        separator = ";";          // altera separador de colunas
+                        break;
+                    default:
+                        std::cout << "Modo de saida invalido" << std::endl;
+                        break;
+                    }
+                }
             }
 
-            switch (outputMode)
-            {
-            case 1:
-            {
-                for (size_t k = 0; k < Passes; k++)
-                    for (size_t i = 0; i < 3; i++)
-                        displayStats(std::cout, " | ", log[k][i], testNames[i], arraySizes[k]); // exibe contadores de comparações e trocas
-                break;
-            }
-            case 2:
-            {
-                std::ofstream myFile;
-                myFile.open("saida.txt");
-                for (size_t k = 0; k < Passes; k++)
-                    for (size_t i = 0; i < 3; i++)
-                        displayStats(myFile, " | ", log[k][i], testNames[i], arraySizes[k]);
-                myFile.close();
-                break;
-            }
-            case 3:
-            {
-                std::ofstream myFile;
-                myFile.open("saida.csv");
-                for (size_t k = 0; k < Passes; k++)
-                    for (size_t i = 0; i < 3; i++)
-                        displayStats(myFile, ";", log[k][i], testNames[i], arraySizes[k]);
-                myFile.close();
-                break;
-            }
-            default:
-                std::cout << "Modo de saida invalido" << std::endl;
-                break;
-            }
+            for (auto i = 0; i < Passes; i++)
+                for (auto j = 0; j < 3; j++)
+                    displayStats(*out, separator, log[i][j], testNames[j], arraySizes[i], timers[i][j]); // exibe contadores de comparações e trocas
 
-            if (!automatic)
+            if (!Automatic)
             {
                 std::cout << std::endl
                           << "Dados prontos! Pressione enter para sair";
                 std::cin.ignore();
                 std::cin.get();
             }
+        }
 
-            delete[] arraySizes;
-            for (size_t i = 0; i < Passes; i++)
+    public:
+        Tester(std::initializer_list<FuncType> functions, std::initializer_list<std::string> funcNames)
+        {
+            if (functions.size() != funcNames.size())
+                throw std::invalid_argument("Erro: Numero de funcoes e nomes de funcoes nao coincidem"); // verifica se número de funções e nomes de funções coincidem
+
+            Functions = functions;   // inicializa vetor de funções de ordenação
+            FuncNames = funcNames;   // inicializa vetor de nomes de funções de ordenação
+            Size = functions.size(); // inicializa tamanho do vetor de funções de ordenação
+            rng.seed(seed_val);      // inicializa semente de geração de números aleatórios
+        }
+
+        Tester(const std::vector<FuncType> &functions, const std::vector<std::string> &funcNames)
+        {
+            if (functions.size() != funcNames.size())
+                throw std::invalid_argument("Erro: Numero de funcoes e nomes de funcoes nao coincidem"); // verifica se número de funções e nomes de funções coincidem
+
+            Functions = functions;   // inicializa vetor de funções de ordenação
+            FuncNames = funcNames;   // inicializa vetor de nomes de funções de ordenação
+            Size = functions.size(); // inicializa tamanho do vetor de funções de ordenação
+            rng.seed(seed_val);      // inicializa semente de geração de números aleatórios
+        }
+
+        ~Tester()
+        {
+            Functions.clear(); // limpa vetor de funções de ordenação
+            FuncNames.clear(); // limpa vetor de nomes de funções de ordenação
+        }
+
+        void virtual TestExecute(FuncType sort, array_t A, array_size_t S, LogType &loginfo) // função de execução de teste
+        {
+            sort(A, S, loginfo); // executa função de ordenação;
+        }
+
+        void virtual displayStats(std::ostream &output, std::string separator, LogType loginfo[], std::string testName, array_size_t S, Timer Timers[])
+        {
+            output << std::endl
+                   << std::setw(CHARWIDTH) << testName << separator << "Tamanho " << S << ":" << std::endl // exibe tipo de teste
+                   << std::setw(CHARWIDTH) << "Nome da funcao"
+                   << separator << std::setw(CHARWIDTH) << "Trocas"
+                   << separator << std::setw(CHARWIDTH) << "Comparacoes"
+                   << separator << std::setw(CHARWIDTH) << "Tempo" << std::endl;
+            for (auto i = 0; i < Size; i++)
+            {
+                output
+                    << std::setw(CHARWIDTH) << FuncNames[i]
+                    << separator << std::setw(CHARWIDTH) << std::get<0>(loginfo[i])
+                    << separator << std::setw(CHARWIDTH) << std::get<1>(loginfo[i])
+                    << separator << std::setw(CHARWIDTH) << Timers[i].Duration().count() << "s" << std::endl;
+            }
+        }
+
+        // Executa os testes de ordenação, com o numero de passadas especificado
+        // e o tamanho inicial do array, o qual é multiplicado por 10 toda a passada
+        // automatic: se true, dados são exibidos direto no terminal
+        void BatchTests(bool automatic, int Passes, array_size_t Initial)
+        {
+            int *arraySizes = new int[Passes];       // armazena o tamanho dos arrays de cada passada
+            arraySizes[0] = Initial;                 // define o tamanho do primeiro array
+            LogType ***log = new LogType **[Passes]; // armazena contadores de comparações e trocas (ver typedef acima)
+            Timer ***timers = new Timer **[Passes];  // armazena contadores de tempo de execução
+
+            for (int i = 0; i < Passes; i++)
+            {
+                if (i > 0)
+                    arraySizes[i] = arraySizes[i - 1] * 10; // calcula o tamanho dos arrays de cada passada
+
+                log[i] = new LogType *[3];  // aloca espaço para cada função de ordenação
+                timers[i] = new Timer *[3]; // aloca espaço para cada função de ordenação
+                for (int j = 0; j < 3; ++j)
+                {
+                    log[i][j] = new LogType[Size];  // aloca espaço para cada função de ordenação
+                    timers[i][j] = new Timer[Size]; // aloca espaço para cada função de ordenação
+                }
+            }
+
+#pragma omp parallel for
+            for (auto i = 0; i < Passes; i++)
+            {
+#pragma omp parallel for
+                for (auto j = 0; j < 3; j++)
+                    runs(arraySizes[i], j, log[i][j], timers[i][j]); // executa as funções de ordenação                                                                  // não mostra mais a primeira passada dos algoritmos
+            }
+
+            Output(automatic, Passes, log, arraySizes, timers); // exibe os resultados
+
+            for (int i = 0; i < Passes; i++)
             {
                 for (int j = 0; j < 3; ++j)
+                {
                     delete[] log[i][j];
+                    delete[] timers[i][j];
+                }
                 delete[] log[i];
+                delete[] timers[i];
             }
             delete[] log;
+            delete[] timers;
+            delete[] arraySizes;
         }
     };
 } // namespace CPD

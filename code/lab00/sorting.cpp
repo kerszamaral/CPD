@@ -4,9 +4,10 @@
 
 using namespace std;
 
-typedef int array_size_t;                                              // Tipo para especificar tamanho do array
-typedef int *array_t;                                                  // Tipo para especificar formato do array
-typedef std::tuple<size_t, size_t, std::chrono::duration<double>> loginfo_t; // armazena contagem de <trocas , comparacoes>
+typedef int array_size_t;                                        // Tipo para especificar tamanho do array
+typedef int *array_t;                                            // Tipo para especificar formato do array
+typedef std::tuple<size_t, size_t> loginfo_t;                    // armazena contagem de <trocas , comparacoes>
+typedef void (*Functions_t)(array_t, array_size_t, loginfo_t &); // Tipo para especificar funções de ordenação
 
 void bubblesort(array_t, array_size_t, loginfo_t &);
 void quicksortPoint(array_t, array_size_t, loginfo_t &);
@@ -18,15 +19,13 @@ void shakesort(array_t array, array_size_t array_size, loginfo_t &loginfo);
 
 #define RUNS 3 // quantidade de vezes que cada teste será executado
 
-int main(void)
+main(void)
 {
     // cout << __cplusplus << endl;                                             // verifica versão do compilador
-
-    cpd::Tester<cpd::SortFunctions_t> tester = cpd::Tester(
-        {cpd::pair(bubblesort, "Bubblesort"),
-         cpd::pair(quicksortPoint, "Quicksort"),
-         cpd::pair(shakesort, "Shakesort"),
-         cpd::pair(combsort, "Combsort")}); // instancia o objeto de teste
+    
+    cpd::Tester<Functions_t, loginfo_t> tester = cpd::Tester<Functions_t, loginfo_t>(
+        {bubblesort, quicksortPoint, shakesort, combsort},
+        {"Bubblesort", "Quicksort", "Shakesort", "Combsort"}); // instancia o objeto de teste
 
     tester.BatchTests(false, RUNS, 100); // executa os testes (automatico, funções de ordenação, tamanho inicial do array
 
@@ -92,8 +91,6 @@ void swap(int *n1, int *n2)
 
 void bubblesort(array_t array, array_size_t array_size, loginfo_t &loginfo)
 {
-    auto start = std::chrono::steady_clock::now();
-
     int trocas = 0;
     int comparacoes = 0;
     int pos_troca = 0;
@@ -119,14 +116,10 @@ void bubblesort(array_t array, array_size_t array_size, loginfo_t &loginfo)
 
     get<0>(loginfo) = trocas;
     get<1>(loginfo) = comparacoes;
-    auto finish = std::chrono::steady_clock::now();
-    get<2>(loginfo) = finish - start;
 }
 
 void shakesort(array_t array, array_size_t array_size, loginfo_t &loginfo)
 {
-    auto start = std::chrono::steady_clock::now();
-
     int trocas = 0;
     int comparacoes = 0;
     int pos_troca = 0;
@@ -163,14 +156,10 @@ void shakesort(array_t array, array_size_t array_size, loginfo_t &loginfo)
 
     get<0>(loginfo) = trocas;
     get<1>(loginfo) = comparacoes;
-    auto finish = std::chrono::steady_clock::now();
-    get<2>(loginfo) = finish - start;
 }
 
 void combsort(array_t array, array_size_t array_size, loginfo_t &loginfo)
 {
-    auto start = std::chrono::steady_clock::now();
-
     int trocas = 0;
     int comparacoes = 0;
     bool troca = true;
@@ -200,6 +189,4 @@ void combsort(array_t array, array_size_t array_size, loginfo_t &loginfo)
 
     get<0>(loginfo) = trocas;
     get<1>(loginfo) = comparacoes;
-    auto finish = std::chrono::steady_clock::now();
-    get<2>(loginfo) = finish - start;
 }
