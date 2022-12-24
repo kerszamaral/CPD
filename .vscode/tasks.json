@@ -40,7 +40,8 @@
                 "-o",
                 "${fileDirname}/${fileBasenameNoExtension}.exe",
                 "-lm",
-                "-I${fileDirname}"
+                "-I${fileDirname}",
+                "-I${cwd}/code/"
             ],
             "options": {
                 "cwd": "${fileDirname}"
