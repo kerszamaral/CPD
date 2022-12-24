@@ -50,7 +50,7 @@ namespace cpd
         std::mt19937 rng;                                                     // gerador de números aleatórios
         uint32_t seed_val;                                                    // semente de geração de números
         std::string testNames[3] = {"Crescente", "Aleatorio", "Decrescente"}; // nomes dos testes
-        const int CHARWIDTH = 14;                                             // largura de caracteres para exibição de dados
+        const int Spacer = 14;                                                // largura de caracteres para exibição de dados
         std::vector<FuncType> Functions;                                      // array de funções de ordenação
         int Size;                                                             // tamanho do array de funções de ordenação
         std::vector<std::string> FuncNames;                                   // array de nomes das funções de ordenação
@@ -116,6 +116,26 @@ namespace cpd
             delete[] array;
         }
 
+        void displayStats(std::ostream &output, const std::string &separator, LogType loginfo[], std::string testName, array_size_t S, Timer Timers[])
+        {
+            output << std::endl
+                   << std::setw(Spacer) << testName << separator << "Tamanho " << S << ":" << std::endl // exibe tipo de teste
+                   << std::setw(Spacer) << "Nome da funcao";
+            DisplayLogNames(output, separator);
+            output << separator << std::setw(Spacer) << "Tempo" << std::endl;
+
+            for (auto i = 0; i < Size; i++)
+            {
+                output << std::setw(Spacer) << FuncNames[i];
+
+                std::apply([this, &output, &separator](auto &&...args)
+                           { ((output << separator << std::setw(Spacer) << args), ...); },
+                           loginfo[i]);
+
+                output << separator << std::setw(Spacer) << Timers[i].Duration().count() << "s" << std::endl;
+            }
+        }
+
         void output(bool &Automatic, int &Passes, LogType **log[], int arraySizes[], Timer **timers[])
         {
             int outputMode = 0;
@@ -158,7 +178,7 @@ namespace cpd
 
             for (auto i = 0; i < Passes; i++)
                 for (auto j = 0; j < 3; j++)
-                    DisplayStats(*out, separator, log[i][j], testNames[j], arraySizes[i], timers[i][j]); // exibe contadores de comparações e trocas
+                    displayStats(*out, separator, log[i][j], testNames[j], arraySizes[i], timers[i][j]); // exibe contadores de comparações e trocas
 
             if (!Automatic)
             {
@@ -198,33 +218,23 @@ namespace cpd
             FuncNames.clear(); // limpa vetor de nomes de funções de ordenação
         }
 
-        void virtual TestFunction(FuncType sort, array_t A, array_size_t S, LogType &loginfo) // função de execução de teste
+        // Define como a função de ordenação deve ser chamada, com os parâmetros necessários
+        void virtual TestFunction(FuncType Function, array_t Array, array_size_t ASize, LogType &loginfo)
         {
-            sort(A, S, loginfo); // executa função de ordenação;
+            Function(Array, ASize, loginfo); // executa função de ordenação;
         }
 
-        void virtual DisplayStats(std::ostream &output, std::string separator, LogType loginfo[], std::string testName, array_size_t S, Timer Timers[])
+        // Exibe os nomes das colunas do log
+        void virtual DisplayLogNames(std::ostream &Output, const std::string &Separator)
         {
-            output << std::endl
-                   << std::setw(CHARWIDTH) << testName << separator << "Tamanho " << S << ":" << std::endl // exibe tipo de teste
-                   << std::setw(CHARWIDTH) << "Nome da funcao"
-                   << separator << std::setw(CHARWIDTH) << "Trocas"
-                   << separator << std::setw(CHARWIDTH) << "Comparacoes"
-                   << separator << std::setw(CHARWIDTH) << "Tempo" << std::endl;
-            for (auto i = 0; i < Size; i++)
-            {
-                output
-                    << std::setw(CHARWIDTH) << FuncNames[i]
-                    << separator << std::setw(CHARWIDTH) << std::get<0>(loginfo[i])
-                    << separator << std::setw(CHARWIDTH) << std::get<1>(loginfo[i])
-                    << separator << std::setw(CHARWIDTH) << Timers[i].Duration().count() << "s" << std::endl;
-            }
+            Output << Separator << std::setw(Spacer) << "Trocas"
+                   << Separator << std::setw(Spacer) << "Comparacoes";
         }
 
         // Executa os testes de ordenação, com o numero de passadas especificado
         // e o tamanho inicial do array, o qual é multiplicado por 10 toda a passada
         // automatic: se true, dados são exibidos direto no terminal
-        void BatchTests(bool automatic, int Passes, array_size_t Initial)
+        void BatchTests(bool Automatic, int Passes, array_size_t Initial)
         {
             int *arraySizes = new int[Passes];       // armazena o tamanho dos arrays de cada passada
             arraySizes[0] = Initial;                 // define o tamanho do primeiro array
@@ -253,7 +263,7 @@ namespace cpd
                     runs(arraySizes[i], j, log[i][j], timers[i][j]); // executa as funções de ordenação                                                                  // não mostra mais a primeira passada dos algoritmos
             }
 
-            output(automatic, Passes, log, arraySizes, timers); // exibe os resultados
+            output(Automatic, Passes, log, arraySizes, timers); // exibe os resultados
 
             for (int i = 0; i < Passes; i++)
             {

@@ -7,7 +7,6 @@ using namespace std;
 typedef int array_size_t;                                        // Tipo para especificar tamanho do array
 typedef int *array_t;                                            // Tipo para especificar formato do array
 typedef std::tuple<size_t, size_t> loginfo_t;                    // armazena contagem de <trocas , comparacoes>
-typedef void (*Functions_t)(array_t, array_size_t, loginfo_t &); // Tipo para especificar funções de ordenação
 
 void bubblesort(array_t, array_size_t, loginfo_t &);
 void quicksortPoint(array_t, array_size_t, loginfo_t &);
@@ -18,10 +17,24 @@ void combsort(array_t array, array_size_t array_size, loginfo_t &loginfo);
 void shakesort(array_t array, array_size_t array_size, loginfo_t &loginfo);
 
 #define RUNS 3 // quantidade de vezes que cada teste será executado
+typedef void (*Functions_t)(array_t, array_size_t, loginfo_t &); // Tipo para especificar funções de ordenação
+
+template <>
+void cpd::Tester<Functions_t, loginfo_t>::TestFunction(Functions_t Function, array_t Array, array_size_t ASize, loginfo_t &loginfo)
+{
+    Function(Array, ASize, loginfo);
+}
+
+template <>
+void cpd::Tester<Functions_t, loginfo_t>::DisplayLogNames(std::ostream &Output, const std::string &Separator)
+{
+    Output << Separator << std::setw(Spacer) << "Trocas"
+           << Separator << std::setw(Spacer) << "Comparacoes";
+}
 
 main(void)
 {
-    // cout << __cplusplus << endl;                                             // verifica versão do compilador
+    cout << __cplusplus << endl;                                             // verifica versão do compilador
 
     cpd::Tester<Functions_t, loginfo_t> tester = cpd::Tester<Functions_t, loginfo_t>(
         {bubblesort, quicksortPoint, shakesort, combsort},
@@ -30,18 +43,6 @@ main(void)
     tester.BatchTests(false, RUNS, 100); // executa os testes (automatico, funções de ordenação, tamanho inicial do array
 
     return 0;
-}
-
-template <>
-void cpd::Tester<Functions_t, loginfo_t>::TestFunction(Functions_t function, array_t array, array_size_t array_size, loginfo_t &loginfo)
-{
-    std::cout << "Test" << std::endl;
-}
-
-template <>
-void cpd::Tester<Functions_t, loginfo_t>::DisplayStats(std::ostream &output, std::string separator, loginfo_t loginfo[], std::string testName, array_size_t S, Timer Timers[])
-{
-    std::cout << "Test" << std::endl;
 }
 
 void quicksortPoint(array_t array, array_size_t array_size, loginfo_t &loginfo)
