@@ -50,7 +50,6 @@ namespace cpd
         std::mt19937 rng;                                                     // gerador de números aleatórios
         uint32_t seed_val;                                                    // semente de geração de números
         std::string testNames[3] = {"Crescente", "Aleatorio", "Decrescente"}; // nomes dos testes
-        const int Spacer = 14;                                                // largura de caracteres para exibição de dados
         std::vector<FuncType> Functions;                                      // array de funções de ordenação
         int Size;                                                             // tamanho do array de funções de ordenação
         std::vector<std::string> FuncNames;                                   // array de nomes das funções de ordenação
@@ -190,6 +189,7 @@ namespace cpd
         }
 
     public:
+        size_t Spacer = 14; // largura de caracteres para exibição de dados
         Tester(std::initializer_list<FuncType> functions, std::initializer_list<std::string> funcNames)
         {
             if (functions.size() != funcNames.size())
