@@ -212,6 +212,36 @@ namespace cpd
             rng.seed(seed_val);      // inicializa semente de geração de números aleatórios
         }
 
+        Tester(std::initializer_list<std::pair<FuncType, std::string>> functions)
+        {
+            Functions.reserve(functions.size()); // reserva espaço para vetor de funções de ordenação
+            FuncNames.reserve(functions.size()); // reserva espaço para vetor de nomes de funções de ordenação
+
+            for (auto &f : functions)
+            {
+                Functions.push_back(f.first);  // inicializa vetor de funções de ordenação
+                FuncNames.push_back(f.second); // inicializa vetor de nomes de funções de ordenação
+            }
+
+            Size = functions.size(); // inicializa tamanho do vetor de funções de ordenação
+            rng.seed(seed_val);      // inicializa semente de geração de números aleatórios
+        }
+
+        Tester(const std::vector<std::pair<FuncType, std::string>> &functions)
+        {
+            Functions.reserve(functions.size()); // reserva espaço para vetor de funções de ordenação
+            FuncNames.reserve(functions.size()); // reserva espaço para vetor de nomes de funções de ordenação
+
+            for (auto &f : functions)
+            {
+                Functions.push_back(f.first);  // inicializa vetor de funções de ordenação
+                FuncNames.push_back(f.second); // inicializa vetor de nomes de funções de ordenação
+            }
+
+            Size = functions.size(); // inicializa tamanho do vetor de funções de ordenação
+            rng.seed(seed_val);      // inicializa semente de geração de números aleatórios
+        }
+
         ~Tester()
         {
             Functions.clear(); // limpa vetor de funções de ordenação
