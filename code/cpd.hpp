@@ -221,14 +221,17 @@ namespace cpd
         // Define como a função de ordenação deve ser chamada, com os parâmetros necessários
         void virtual TestFunction(FuncType Function, array_t Array, array_size_t ASize, LogType &loginfo)
         {
-            Function(Array, ASize, loginfo); // executa função de ordenação;
+            const auto e = std::logic_error("Erro: Funcao TestFunction nao implementada");
+            std::cout << e.what() << std::endl;
+            throw e;
         }
 
         // Exibe os nomes das colunas do log
         void virtual DisplayLogNames(std::ostream &Output, const std::string &Separator)
         {
-            Output << Separator << std::setw(Spacer) << "Trocas"
-                   << Separator << std::setw(Spacer) << "Comparacoes";
+            const auto e = std::logic_error("Erro: Funcao DisplayLogNames nao implementada");
+            std::cout << e.what() << std::endl;
+            throw e;
         }
 
         // Executa os testes de ordenação, com o numero de passadas especificado
