@@ -1,4 +1,4 @@
-#include "cpd.hpp"
+#include "../cpd.hpp"
 
 #include <random>
 
