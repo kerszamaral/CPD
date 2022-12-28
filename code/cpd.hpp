@@ -183,7 +183,7 @@ namespace cpd
                 for (size_t j = 0; j < (Spacer+3); j++)
                 {
                     *out << "=="; // exibe linha de separação
-                    for (auto k = 0; k < std::tuple_size<LogType>::value; k++)
+                    for (auto k = 0; k < (int)std::tuple_size<LogType>::value; k++)
                         *out << "="; // exibe linha de separação
                 }
                 *out << std::endl;
