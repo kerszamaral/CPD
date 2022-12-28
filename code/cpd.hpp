@@ -153,7 +153,7 @@ namespace cpd
                           << "Entre com o modo de saida: ";
 
                 std::cin >> outputMode; // lê modo de saída
-                while (outputMode < 1 || outputMode > 3)
+                do
                 {
                     switch (outputMode)
                     {
@@ -172,13 +172,23 @@ namespace cpd
                         std::cout << "Modo de saida invalido" << std::endl;
                         break;
                     }
-                }
+                } while (outputMode < 1 || outputMode > 3);
             }
 
             for (auto i = 0; i < Passes; i++)
+            {
                 for (auto j = 0; j < 3; j++)
                     displayStats(*out, separator, log[i][j], testNames[j], arraySizes[i], timers[i][j]); // exibe contadores de comparações e trocas
-
+                *out << std::endl;
+                for (size_t j = 0; j < (Spacer+3); j++)
+                {
+                    *out << "=="; // exibe linha de separação
+                    for (auto k = 0; k < std::tuple_size<LogType>::value; k++)
+                        *out << "="; // exibe linha de separação
+                }
+                *out << std::endl;
+    
+            }
             if (!Automatic)
             {
                 std::cout << std::endl
