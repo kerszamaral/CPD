@@ -1,8 +1,3 @@
-/*
-Ian Kersz Amaral -- 00338368
-UFRGS 2022
-Header para os trabalhos de laboratório de CPD
-*/
 #pragma once
 
 #include <iostream>
