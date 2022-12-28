@@ -47,12 +47,13 @@ namespace cpd
     class Tester // classe para testar funções de ordenação
     {
     private:
-        std::mt19937 rng;                                                     // gerador de números aleatórios
-        uint32_t seed_val;                                                    // semente de geração de números
-        std::string testNames[3] = {"Crescente", "Aleatorio", "Decrescente"}; // nomes dos testes
-        std::vector<FuncType> Functions;                                      // array de funções de ordenação
-        int Size;                                                             // tamanho do array de funções de ordenação
-        std::vector<std::string> FuncNames;                                   // array de nomes das funções de ordenação
+#define TestSize 4                                                                             // número de testes a serem realizados
+        std::mt19937 rng;                                                                      // gerador de números aleatórios
+        uint32_t seed_val;                                                                     // semente de geração de números
+        std::string testNames[TestSize] = {"Crescente", "Aleatorio", "Decrescente", "Iguais"}; // nomes dos testes
+        std::vector<FuncType> Functions;                                                       // array de funções de ordenação
+        int Size;                                                                              // tamanho do array de funções de ordenação
+        std::vector<std::string> FuncNames;                                                    // array de nomes das funções de ordenação
 
     private:
         void testTimer(FuncType sort, array_t A, array_size_t S, LogType &loginfo, Timer &time) // função para testar tempo de execução
@@ -84,6 +85,10 @@ namespace cpd
             case 2:
                 for (size_t i = 0; i < Array_Size; i++)
                     array[0][i] = Array_Size - i; // gera números em ordem decrescente
+                break;
+            case 3:
+                for (size_t i = 0; i < Array_Size; i++)
+                    array[0][i] = 1; // gera números iguais
                 break;
             default:
                 std::cout << "Tipo de array inválido" << std::endl;
@@ -177,17 +182,16 @@ namespace cpd
 
             for (auto i = 0; i < Passes; i++)
             {
-                for (auto j = 0; j < 3; j++)
+                for (auto j = 0; j < TestSize; j++)
                     displayStats(*out, separator, log[i][j], testNames[j], arraySizes[i], timers[i][j]); // exibe contadores de comparações e trocas
                 *out << std::endl;
-                for (size_t j = 0; j < (Spacer+3); j++)
+                for (size_t j = 0; j < (Spacer + 3); j++)
                 {
                     *out << "=="; // exibe linha de separação
                     for (auto k = 0; k < (int)std::tuple_size<LogType>::value; k++)
                         *out << "="; // exibe linha de separação
                 }
                 *out << std::endl;
-    
             }
             if (!Automatic)
             {
@@ -289,9 +293,9 @@ namespace cpd
                 if (i > 0)
                     arraySizes[i] = arraySizes[i - 1] * 10; // calcula o tamanho dos arrays de cada passada
 
-                log[i] = new LogType *[3];  // aloca espaço para cada função de ordenação
-                timers[i] = new Timer *[3]; // aloca espaço para cada função de ordenação
-                for (int j = 0; j < 3; ++j)
+                log[i] = new LogType *[TestSize];  // aloca espaço para cada função de ordenação
+                timers[i] = new Timer *[TestSize]; // aloca espaço para cada função de ordenação
+                for (int j = 0; j < TestSize; ++j)
                 {
                     log[i][j] = new LogType[Size];  // aloca espaço para cada função de ordenação
                     timers[i][j] = new Timer[Size]; // aloca espaço para cada função de ordenação
@@ -302,7 +306,7 @@ namespace cpd
             for (auto i = 0; i < Passes; i++)
             {
 #pragma omp parallel for
-                for (auto j = 0; j < 3; j++)
+                for (auto j = 0; j < TestSize; j++)
                     runs(arraySizes[i], j, log[i][j], timers[i][j]); // executa as funções de ordenação                                                                  // não mostra mais a primeira passada dos algoritmos
             }
 
@@ -310,7 +314,7 @@ namespace cpd
 
             for (int i = 0; i < Passes; i++)
             {
-                for (int j = 0; j < 3; ++j)
+                for (int j = 0; j < TestSize; ++j)
                 {
                     delete[] log[i][j];
                     delete[] timers[i][j];

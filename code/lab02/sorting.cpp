@@ -5,6 +5,7 @@
 // o do google collab é C++14
 // A grande maioria dos compiladores atuais suporta nativamente c++11.
 // Outros exigem a configuração de parâmetros de compilação... Verifique a documentação do seu.
+#include "../cpd.hpp"
 
 #include <iostream>
 #include <tuple>
@@ -14,10 +15,10 @@
 
 using namespace std;
 
-typedef int array_size_t;               // Tipo para especificar tamanho do array
-typedef int *array_t;                   // Tipo para especificar formato do array
-typedef std::tuple<int, int, std::chrono::duration<double>> loginfo_t; // armazena contagem de <trocas , comparacoes>
-typedef std::mt19937 MyRNG;             // Gerador de números aleatórios do tipo Mersenne Twister Random Generator
+typedef int array_size_t;                       // Tipo para especificar tamanho do array
+typedef int *array_t;                           // Tipo para especificar formato do array
+typedef std::tuple<size_t, size_t> loginfo_t; // armazena contagem de <trocas , comparacoes>
+typedef std::mt19937 MyRNG;                     // Gerador de números aleatórios do tipo Mersenne Twister Random Generator
 
 MyRNG rng;         // gerador de números aleatórios
 uint32_t seed_val; // semente de geração de números
@@ -26,141 +27,71 @@ void bubblesort(array_t, array_size_t, loginfo_t &);
 void quicksort(array_t, int, int, loginfo_t &);
 int particiona(array_t array, int i, int f, loginfo_t &);
 void swap(int *n1, int *n2);
-void runs(int MAX, int type, bool display, loginfo_t *log);
-void displayArray(std::string &name, loginfo_t &loginfo);
 void combsort(array_t array, array_size_t array_size, loginfo_t &loginfo);
 void shakesort(array_t array, array_size_t array_size, loginfo_t &loginfo);
+void insertion_sort(array_t array, array_size_t array_size, loginfo_t &loginfo);
+void quicksortPoint(array_t array, array_size_t array_size, loginfo_t &loginfo);
+void quicksortRand(array_t array, array_size_t array_size, loginfo_t &loginfo);
+void quicksortIter(array_t array, array_size_t array_size, loginfo_t &loginfo);
 
-std::string testNames[] = {"Crescente", "Aleatorio", "Decrescente"};
-std::string sortNames[] = {"Bubblesort", "Quicksort", "Shakesort", "Combsort"};
+#define RUNS 1                                                   // quantidade de vezes que cada teste será executado
+typedef void (*Functions_t)(array_t, array_size_t, loginfo_t &); // Tipo para especificar funções de ordenação
 
-#define TESTS 4 // quantidade de testes a serem executados
-#define RUNS 4  // quantidade de vezes que cada teste será executado
+template <>
+void cpd::Tester<Functions_t, loginfo_t>::TestFunction(Functions_t Function, array_t Array, array_size_t ASize, loginfo_t &loginfo)
+{
+    Function(Array, ASize, loginfo);
+}
+
+template <>
+void cpd::Tester<Functions_t, loginfo_t>::DisplayLogNames(std::ostream &Output, const std::string &Separator)
+{
+    Output << Separator << std::setw(Spacer) << "Trocas"
+           << Separator << std::setw(Spacer) << "Comparacoes";
+}
 
 int main(void)
 {
-    int MAX = 50; // quantidade de números no array
-    bool show = true;
-    // cout << __cplusplus << endl;                                             // verifica versão do compilador
-    rng.seed(seed_val); // inicializa semente de geração de números aleatórios
+    cpd::Timer timer;
 
-    for (auto k = 0; k < RUNS; k++)
-    {
-        cout << endl << "Tamanho do Array testado: " << MAX << endl;
+    cpd::Tester<Functions_t, loginfo_t> tester = cpd::Tester<Functions_t, loginfo_t>(
+        {bubblesort, quicksortPoint, shakesort, combsort, insertion_sort, quicksortIter, quicksortRand},
+        {"Bubblesort", "Quicksort", "Shakesort", "Combsort", "Insertionsort", "quicksort Iterative", "Quicksort Random"}); // instancia o objeto de teste
 
-        loginfo_t log[3][TESTS];
-
-        for (auto i = 0; i < 3; i++)
-            runs(MAX, i, show, log[i]);
-
-        // TODO: armazenar essas informações em um matriz ou hashtable
-        //! DONE
-
-        for (auto i = 0; i < 3; i++)
-        {
-            // TODO: mostrar informações de execução de todos os algoritmos
-            //! DONE
-            cout << endl << "\tTeste " << testNames[i] << ":" << endl;
-            for(auto j = 0; j < TESTS; j++)
-                displayArray(sortNames[j], log[i][j]);
-        }
-
-        if (k == 0)
-        {
-            show = false;
-            MAX += 50;
-        }
-        else
-            MAX *= 10;
-    }
-
+    tester.Spacer = 28;
+    timer.Start();
+    tester.BatchTests(false, 3, 100);
+    timer.Stop();
+    std::cout << timer.Duration().count() << endl;
     return 0;
 }
 
-void displayArray(std::string &name, loginfo_t &loginfo)
+void quicksortIter(array_t array, array_size_t array_size, loginfo_t &loginfo)
 {
-    cout << "\t\t" << name << ":" << endl;
-    cout << "\t\t\tQuantidade de trocas: " << get<0>(loginfo) << endl;
-    cout << "\t\t\tQuantidade de comparações: " << get<1>(loginfo) << endl;
-    cout << "\t\t\tTempo de execucao: " << get<2>(loginfo).count() << "s" << endl;
-}
-
-void runs(int MAX, int type, bool display, loginfo_t *log)
-{
-    uniform_int_distribution<> distrib(0, INT_MAX); // cria gerador com distribuição uniforme entre 0 e MAX_INT
-    loginfo_t *loginfo = new loginfo_t[TESTS];      // armazena contadores de comparações e trocas (ver typedef acima)
-
-    int **array = new int *[TESTS]; // array dinâmico que armazena os números
-    for (int i = 0; i < TESTS; ++i)
-        array[i] = new int[MAX];
-
-    // testar com as 3 versões de array (aleatório, crescente e decrescente):
-    if (type == 1)
-        for (auto i = 0; i < MAX; i++)
-            array[0][i] = distrib(rng); // gera números aleatórios para o array
-    else if (type == 2)
-        for (auto i = 0; i < MAX; i++)
-            array[0][i] = MAX - i; // gera números em ordem decrescente
-    else
-        for (auto i = 0; i < MAX; i++)
-            array[0][i] = i + 1; // gera números em ordem crescente
-
-    for (auto j = 0; j < TESTS; j++)
-        for (auto i = 0; i < MAX; i++)
-            array[j][i] = array[0][i];
-
-    if (display)
+    int p, i, f;
+    stack<int> pilha;
+    pilha.push(0);
+    pilha.push(array_size - 1);
+    while (!pilha.empty())
     {
-        cout << endl
-             << "Array gerado: ";
-        for (auto i = 0; i < MAX; i++)
-            cout << array[0][i] << " ";
-        cout << endl;
-    }
-
-    // TODO: testar os outros algoritmos (insertion_sortBB e shellsort)
-    //! DONE
-
-    switch (TESTS)
-    {
-    case 5:
-
-    case 4:
-        combsort(array[3], MAX, loginfo[3]);
-    case 3:
-        shakesort(array[2], MAX, loginfo[2]);
-    case 2:
-        quicksort(array[1], 0, MAX - 1, loginfo[1]); // passa início e fim do trecho de processamento (MAX-1)
-    case 1:
-        bubblesort(array[0], MAX, loginfo[0]); // passa tamanho do array
-        break;
-    }
-
-    if (display)
-    {
-        for (auto j = 0; j < TESTS; j++)
+        f = pilha.top();
+        pilha.pop();
+        i = pilha.top();
+        pilha.pop();
+        if (f > i)
         {
-            cout << endl
-                 << "Array ordenado " << sortNames[j] << ": ";
-            for (auto i = 0; i < MAX; i++)
-                cout << array[j][i] << " ";
-            cout << endl;
+            p = particiona(array, i, f, loginfo);
+            pilha.push(i);
+            pilha.push(p - 1);
+            pilha.push(p + 1);
+            pilha.push(f);
         }
     }
-
-    for (auto i = 0; i < TESTS; i++)
-        delete[] array[i];
-
-    delete[] array;
-
-    for (auto i = 0; i < TESTS; i++)
-        log[i] = loginfo[i];
 }
 
 // Função de quicksort
 void quicksort(array_t array, int i, int f, loginfo_t &loginfo)
 {
-    auto start = std::chrono::steady_clock::now();
     int p;
     if (f > i)
     {
@@ -168,8 +99,17 @@ void quicksort(array_t array, int i, int f, loginfo_t &loginfo)
         quicksort(array, i, p - 1, loginfo);
         quicksort(array, p + 1, f, loginfo);
     }
-    auto finish = std::chrono::steady_clock::now();
-    get<2>(loginfo) = finish - start;
+}
+
+void quicksortRand(array_t array, array_size_t array_size, loginfo_t &loginfo)
+{
+    swap(&array[rand() % (array_size)], &array[0]);
+    quicksort(array, 0, array_size - 1, loginfo); // passa início e fim do trecho de processamento (MAX-1)
+}
+
+void quicksortPoint(array_t array, array_size_t array_size, loginfo_t &loginfo)
+{
+    quicksort(array, 0, array_size - 1, loginfo); // passa início e fim do trecho de processamento (MAX-1)
 }
 
 int particiona(array_t array, int esq, int dir, loginfo_t &loginfo)
@@ -214,8 +154,6 @@ void swap(int *n1, int *n2)
 
 void bubblesort(array_t array, array_size_t array_size, loginfo_t &loginfo)
 {
-    auto start = std::chrono::steady_clock::now();
-
     int trocas = 0;
     int comparacoes = 0;
     int pos_troca = 0;
@@ -241,14 +179,10 @@ void bubblesort(array_t array, array_size_t array_size, loginfo_t &loginfo)
 
     get<0>(loginfo) = trocas;
     get<1>(loginfo) = comparacoes;
-    auto finish = std::chrono::steady_clock::now();
-    get<2>(loginfo) = finish - start;
 }
 
 void shakesort(array_t array, array_size_t array_size, loginfo_t &loginfo)
 {
-    auto start = std::chrono::steady_clock::now();
-
     int trocas = 0;
     int comparacoes = 0;
     int pos_troca = 0;
@@ -285,14 +219,10 @@ void shakesort(array_t array, array_size_t array_size, loginfo_t &loginfo)
 
     get<0>(loginfo) = trocas;
     get<1>(loginfo) = comparacoes;
-    auto finish = std::chrono::steady_clock::now();
-    get<2>(loginfo) = finish - start;
 }
 
 void combsort(array_t array, array_size_t array_size, loginfo_t &loginfo)
 {
-    auto start = std::chrono::steady_clock::now();
-
     int trocas = 0;
     int comparacoes = 0;
     bool troca = true;
@@ -307,7 +237,7 @@ void combsort(array_t array, array_size_t array_size, loginfo_t &loginfo)
             troca = false;
             gap = 1;
         }
-        
+
         for (auto i = 0; i + gap <= qtd_elementos; i++)
         {
             comparacoes++;
@@ -322,6 +252,30 @@ void combsort(array_t array, array_size_t array_size, loginfo_t &loginfo)
 
     get<0>(loginfo) = trocas;
     get<1>(loginfo) = comparacoes;
-    auto finish = std::chrono::steady_clock::now();
-    get<2>(loginfo) = finish - start;
+}
+// Função de insertion Sort
+void insertion_sort(array_t array, array_size_t array_size, loginfo_t &loginfo)
+{
+    int trocas = 0;
+    int comparacoes = 0;
+    for (int i = 1; i < array_size; i++)
+    {                          // do segundo ao último
+        auto chave = array[i]; // chave a inserir no subarray ordenado
+        auto j = i - 1;        // último elemento do subarray ordenado
+        comparacoes = comparacoes + 1;
+        while (j >= 0 && array[j] > chave)
+        { // busca linear da direita para a esquerda no subarray ordenado
+            comparacoes = comparacoes + 1;
+            array[j + 1] = array[j];
+            j = j - 1;
+            trocas = trocas + 1;
+        }
+        if (j + 1 != i)
+        {
+            array[j + 1] = chave;
+            trocas = trocas + 1;
+        }
+    }
+    get<0>(loginfo) = trocas;
+    get<1>(loginfo) = comparacoes;
 }

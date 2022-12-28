@@ -16,7 +16,7 @@ void swap(int *n1, int *n2);
 void combsort(array_t array, array_size_t array_size, loginfo_t &loginfo);
 void shakesort(array_t array, array_size_t array_size, loginfo_t &loginfo);
 
-#define RUNS 3 // quantidade de vezes que cada teste será executado
+#define RUNS 1 // quantidade de vezes que cada teste será executado
 typedef void (*Functions_t)(array_t, array_size_t, loginfo_t &); // Tipo para especificar funções de ordenação
 
 template <>

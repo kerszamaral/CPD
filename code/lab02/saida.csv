@@ -1,0 +1,136 @@
+
+     Crescente;Tamanho 100:
+Nome da funcao;        Trocas;   Comparacoes;         Tempo
+    Bubblesort;             0;            99;         1e-06s
+     Shakesort;             0;            99;             0s
+      Combsort;             0;          1102;         4e-06s
+ Insertionsort;             0;            99;             0s
+ quicksortIter;             0;          4949;       5.6e-05s
+
+     Aleatorio;Tamanho 100:
+Nome da funcao;        Trocas;   Comparacoes;         Tempo
+    Bubblesort;          2440;          4590;       2.8e-05s
+     Shakesort;          2440;          4382;       2.7e-05s
+      Combsort;           252;          1300;         7e-06s
+ Insertionsort;          2532;          2539;         7e-06s
+ quicksortIter;           136;           783;       2.3e-05s
+
+   Decrescente;Tamanho 100:
+Nome da funcao;        Trocas;   Comparacoes;         Tempo
+    Bubblesort;          4950;          4950;       3.7e-05s
+     Shakesort;          4950;          7498;       4.2e-05s
+      Combsort;           122;          1102;         4e-06s
+ Insertionsort;          5049;          5049;       1.2e-05s
+ quicksortIter;            50;          4950;       4.2e-05s
+
+        Iguais;Tamanho 100:
+Nome da funcao;        Trocas;   Comparacoes;         Tempo
+    Bubblesort;             0;            99;         1e-06s
+     Shakesort;             0;            99;             0s
+      Combsort;             0;          1102;         4e-06s
+ Insertionsort;             0;            99;             0s
+ quicksortIter;             0;          4949;       7.4e-05s
+
+====================================================================
+
+     Crescente;Tamanho 1000:
+Nome da funcao;        Trocas;   Comparacoes;         Tempo
+    Bubblesort;             0;           999;         4e-06s
+     Shakesort;             0;           999;         2e-06s
+      Combsort;             0;         19725;       5.8e-05s
+ Insertionsort;             0;           999;         3e-06s
+ quicksortIter;             0;        499499;      0.005864s
+
+     Aleatorio;Tamanho 1000:
+Nome da funcao;        Trocas;   Comparacoes;         Tempo
+    Bubblesort;        246469;        496071;       0.00433s
+     Shakesort;        246469;        416765;      0.004317s
+      Combsort;          4685;         21723;      0.000172s
+ Insertionsort;        247459;        247468;      0.000931s
+ quicksortIter;          2199;         13378;      0.000338s
+
+   Decrescente;Tamanho 1000:
+Nome da funcao;        Trocas;   Comparacoes;         Tempo
+    Bubblesort;        499500;        499500;      0.006039s
+     Shakesort;        499500;        749998;      0.006777s
+      Combsort;          1586;         19725;       9.5e-05s
+ Insertionsort;        500499;        500499;      0.001814s
+ quicksortIter;           500;        499500;      0.004295s
+
+        Iguais;Tamanho 1000:
+Nome da funcao;        Trocas;   Comparacoes;         Tempo
+    Bubblesort;             0;           999;         2e-06s
+     Shakesort;             0;           999;         2e-06s
+      Combsort;             0;         19725;         5e-05s
+ Insertionsort;             0;           999;         3e-06s
+ quicksortIter;             0;        499499;      0.002701s
+
+====================================================================
+
+     Crescente;Tamanho 10000:
+Nome da funcao;        Trocas;   Comparacoes;         Tempo
+    Bubblesort;             0;          9999;       1.7e-05s
+     Shakesort;             0;          9999;       1.8e-05s
+      Combsort;             0;        286739;      0.000845s
+ Insertionsort;             0;          9999;         3e-05s
+ quicksortIter;             0;      49994999;      0.288742s
+
+     Aleatorio;Tamanho 10000:
+Nome da funcao;        Trocas;   Comparacoes;         Tempo
+    Bubblesort;      24694537;      49966976;      0.314788s
+     Shakesort;      24694537;      41321263;      0.280596s
+      Combsort;         62713;        326735;      0.001704s
+ Insertionsort;      24704530;      24704536;      0.054263s
+ quicksortIter;         29805;        184952;      0.002662s
+
+   Decrescente;Tamanho 10000:
+Nome da funcao;        Trocas;   Comparacoes;         Tempo
+    Bubblesort;      49995000;      49995000;       0.35946s
+     Shakesort;      49995000;      74999998;       0.40957s
+      Combsort;         20040;        286739;      0.000822s
+ Insertionsort;      50004999;      50004999;      0.106179s
+ quicksortIter;          5000;      49995000;      0.239593s
+
+        Iguais;Tamanho 10000:
+Nome da funcao;        Trocas;   Comparacoes;         Tempo
+    Bubblesort;             0;          9999;       3.5e-05s
+     Shakesort;             0;          9999;       3.8e-05s
+      Combsort;             0;        286739;      0.001336s
+ Insertionsort;             0;          9999;       2.5e-05s
+ quicksortIter;             0;      49994999;      0.248704s
+
+====================================================================
+
+     Crescente;Tamanho 100000:
+Nome da funcao;        Trocas;   Comparacoes;         Tempo
+    Bubblesort;             0;         99999;      0.000276s
+     Shakesort;             0;         99999;      0.000283s
+      Combsort;             0;       3766749;      0.012677s
+ Insertionsort;             0;         99999;      0.000482s
+ quicksortIter;             0;    4999949999;       24.1574s
+
+     Aleatorio;Tamanho 100000:
+Nome da funcao;        Trocas;   Comparacoes;         Tempo
+    Bubblesort;   -1797551514;     704515547;       32.4902s
+     Shakesort;   -1797551514;    -126428294;       28.2628s
+      Combsort;        814113;       3966747;      0.021399s
+ Insertionsort;   -1797451524;   -1797451515;       5.58094s
+ quicksortIter;        374656;       2356513;      0.033104s
+
+   Decrescente;Tamanho 100000:
+Nome da funcao;        Trocas;   Comparacoes;         Tempo
+    Bubblesort;     704982704;     704982704;       37.1701s
+     Shakesort;     704982704;   -1089934594;        41.628s
+      Combsort;        243528;       3766749;      0.011168s
+ Insertionsort;     705082703;     705082703;       11.2568s
+ quicksortIter;         50000;    4999950000;       24.5673s
+
+        Iguais;Tamanho 100000:
+Nome da funcao;        Trocas;   Comparacoes;         Tempo
+    Bubblesort;             0;         99999;      0.000155s
+     Shakesort;             0;         99999;      0.000153s
+      Combsort;             0;       3766749;      0.008924s
+ Insertionsort;             0;         99999;      0.000239s
+ quicksortIter;             0;    4999949999;       24.0188s
+
+====================================================================
