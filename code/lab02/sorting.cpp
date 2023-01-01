@@ -10,15 +10,16 @@
 #include <iostream>
 #include <tuple>
 #include <random>
-#include <bits/stdc++.h>
+// #include <bits/stdc++.h>
+#include <stack>
 #include <chrono>
 
 using namespace std;
 
-typedef int array_size_t;                       // Tipo para especificar tamanho do array
-typedef int *array_t;                           // Tipo para especificar formato do array
+typedef int array_size_t;                     // Tipo para especificar tamanho do array
+typedef int *array_t;                         // Tipo para especificar formato do array
 typedef std::tuple<size_t, size_t> loginfo_t; // armazena contagem de <trocas , comparacoes>
-typedef std::mt19937 MyRNG;                     // Gerador de números aleatórios do tipo Mersenne Twister Random Generator
+typedef std::mt19937 MyRNG;                   // Gerador de números aleatórios do tipo Mersenne Twister Random Generator
 
 MyRNG rng;         // gerador de números aleatórios
 uint32_t seed_val; // semente de geração de números
@@ -34,57 +35,107 @@ void quicksortPoint(array_t array, array_size_t array_size, loginfo_t &loginfo);
 void quicksortRand(array_t array, array_size_t array_size, loginfo_t &loginfo);
 void quicksortIter(array_t array, array_size_t array_size, loginfo_t &loginfo);
 
-#define RUNS 1                                                   // quantidade de vezes que cada teste será executado
+//Implementações para a utilização da biblioteca cpd
 typedef void (*Functions_t)(array_t, array_size_t, loginfo_t &); // Tipo para especificar funções de ordenação
 
 template <>
 void cpd::Tester<Functions_t, loginfo_t>::TestFunction(Functions_t Function, array_t Array, array_size_t ASize, loginfo_t &loginfo)
 {
-    Function(Array, ASize, loginfo);
+    Function(Array, ASize, loginfo); // executa a função de ordenação
 }
 
 template <>
 void cpd::Tester<Functions_t, loginfo_t>::DisplayLogNames(std::ostream &Output, const std::string &Separator)
 {
-    Output << Separator << std::setw(Spacer) << "Trocas"
-           << Separator << std::setw(Spacer) << "Comparacoes";
+    Output << Separator << std::setw(Spacer) << "Trocas" 
+           << Separator << std::setw(Spacer) << "Comparacoes"; // exibe os nomes das métricas de log
+}
+
+void TestLoop(int runs, bool automatic, bool crash)
+{
+    cpd::Timer timer;
+    cpd::Tester<Functions_t, loginfo_t> tester = cpd::Tester<Functions_t, loginfo_t>({{insertion_sort, "Insertionsort"}}); // instancia o objeto de teste
+
+    if (crash)
+    {
+        tester = cpd::Tester<Functions_t, loginfo_t>({{insertion_sort, "Insertionsort"},
+                                                      {bubblesort, "Bubblesort"},
+                                                      {shakesort, "Shakesort"},
+                                                      {combsort, "Combsort"},
+                                                      {quicksortIter, "Quicksort Iterative"},
+                                                      {quicksortPoint, "Quicksort Original"},
+                                                      {quicksortRand, "Quicksort Random"}}); // instancia o objeto de teste
+    }
+    else
+    {
+        tester = cpd::Tester<Functions_t, loginfo_t>({{insertion_sort, "Insertionsort"},
+                                                      {bubblesort, "Bubblesort"},
+                                                      {shakesort, "Shakesort"},
+                                                      {combsort, "Combsort"},
+                                                      {quicksortIter, "Quicksort Iterative"}}); // instancia o objeto de teste
+    }
+    tester.Spacer = 28;
+    timer.Start();
+    tester.BatchTests(automatic, runs, 100);
+    timer.Stop();
+    std::cout << "Tempo de execução do codigo:" << timer.Duration().count() << endl;
 }
 
 int main(void)
 {
-    cpd::Timer timer;
+    while (true)
+    {
+        int runs;
+        bool automatic, crash;
+        cout << "Digite o numero de execucoes (0 para sair): ";
+        cin >> runs;
+        if (runs <= 0)
+        {
+            break;
+        }
+        cout << "Digite 1 para automatico ou 0 para manual: ";
+        cin >> automatic;
+        cout << "Digite 1 para possivel estouro de pilha ou 0 para sem as funcoes recursivas: ";
+        cin >> crash;
+        TestLoop(runs, automatic, crash);
+    }
 
-    cpd::Tester<Functions_t, loginfo_t> tester = cpd::Tester<Functions_t, loginfo_t>(
-        {bubblesort, quicksortPoint, shakesort, combsort, insertion_sort, quicksortIter, quicksortRand},
-        {"Bubblesort", "Quicksort", "Shakesort", "Combsort", "Insertionsort", "quicksort Iterative", "Quicksort Random"}); // instancia o objeto de teste
-
-    tester.Spacer = 28;
-    timer.Start();
-    tester.BatchTests(false, 3, 100);
-    timer.Stop();
-    std::cout << timer.Duration().count() << endl;
     return 0;
 }
 
 void quicksortIter(array_t array, array_size_t array_size, loginfo_t &loginfo)
 {
-    int p, i, f;
-    stack<int> pilha;
-    pilha.push(0);
-    pilha.push(array_size - 1);
-    while (!pilha.empty())
+    for (int i = 1; i < array_size; i++) // Verifica se o array já está ordenado
     {
-        f = pilha.top();
-        pilha.pop();
-        i = pilha.top();
-        pilha.pop();
+        get<1>(loginfo)++; // Incrementa a contagem de comparações
+        if (array[i - 1] > array[i])
+        {
+            break; // Se não estiver, sai do loop
+        }
+
+        if (i == array_size - 1)
+        {
+            return; // Se estiver, retorna
+        }
+    }
+
+    int p, i, f;                // Declara as variáveis
+    stack<int> pilha;           // Cria a pilha
+    pilha.push(0);              // Empilha o primeiro elemento
+    pilha.push(array_size - 1); // Empilha o último elemento
+    while (!pilha.empty())      // Enquanto a pilha não estiver vazia
+    {
+        f = pilha.top(); // Desempilha o último elemento
+        pilha.pop();     // Desempilha o último elemento
+        i = pilha.top(); // Desempilha o último elemento
+        pilha.pop();     // Desempilha o último elemento
         if (f > i)
         {
-            p = particiona(array, i, f, loginfo);
-            pilha.push(i);
-            pilha.push(p - 1);
-            pilha.push(p + 1);
-            pilha.push(f);
+            p = particiona(array, i, f, loginfo); // Particiona o array
+            pilha.push(i);                        // Empilha o primeiro elemento
+            pilha.push(p - 1);                    // Empilha o último elemento
+            pilha.push(p + 1);                    // Empilha o primeiro elemento
+            pilha.push(f);                        // Empilha o último elemento
         }
     }
 }
@@ -103,8 +154,8 @@ void quicksort(array_t array, int i, int f, loginfo_t &loginfo)
 
 void quicksortRand(array_t array, array_size_t array_size, loginfo_t &loginfo)
 {
-    swap(&array[rand() % (array_size)], &array[0]);
-    quicksort(array, 0, array_size - 1, loginfo); // passa início e fim do trecho de processamento (MAX-1)
+    swap(&array[rand() % (array_size)], &array[0]); // troca o primeiro elemento com um aleatório
+    quicksort(array, 0, array_size - 1, loginfo);   // passa início e fim do trecho de processamento (MAX-1)
 }
 
 void quicksortPoint(array_t array, array_size_t array_size, loginfo_t &loginfo)
@@ -231,7 +282,7 @@ void combsort(array_t array, array_size_t array_size, loginfo_t &loginfo)
 
     while (troca)
     {
-        gap = floor(gap / 1.3);
+        gap = floor(gap / 1.3); // 1.3 é o fator de redução
         if (gap < 1)
         {
             troca = false;
