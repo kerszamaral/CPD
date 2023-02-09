@@ -31,8 +31,6 @@ template <>
 void cpd::Tester<sortfunc_t, loginfo_t>::TestFunction(sortfunc_t Function, array_t &Array, loginfo_t &loginfo)
 {
     Function(Array, loginfo); // executa a função de ordenação
-    // auto test = Array.size();
-    // swap(Array[0], Array[test-1]); // troca o primeiro elemento com o último para facilitar a verificação
 }
 
 template <>
@@ -110,7 +108,7 @@ void heapsort(array_t &array, loginfo_t &loginfo)
 void buildheap(array_t &array, loginfo_t &loginfo)
 {
     int ultimo_pai = (array.size() / 2) - 1;
-    for (auto i = ultimo_pai; i > 0; i--)
+    for (auto i = ultimo_pai; i >= 0; i--)
         heapify(array, i, array.size(), loginfo);
 }
 
