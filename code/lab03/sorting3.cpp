@@ -28,9 +28,11 @@ void swap(element_t *n1, element_t *n2);
 typedef void (*sortfunc_t)(array_t &, loginfo_t &);
 
 template <>
-void cpd::Tester<sortfunc_t, loginfo_t>::TestFunction(sortfunc_t Function, array_t Array, array_size_t ASize, loginfo_t &loginfo)
+void cpd::Tester<sortfunc_t, loginfo_t>::TestFunction(sortfunc_t Function, array_t &Array, loginfo_t &loginfo)
 {
-    Function(Array, ASize, loginfo); // executa a função de ordenação
+    Function(Array, loginfo); // executa a função de ordenação
+    // auto test = Array.size();
+    // swap(Array[0], Array[test-1]); // troca o primeiro elemento com o último para facilitar a verificação
 }
 
 template <>
@@ -42,8 +44,9 @@ void cpd::Tester<sortfunc_t, loginfo_t>::DisplayLogNames(std::ostream &Output, c
 
 int main(void)
 {
-    auto tester = cpd::Tester<, loginfo_t>();
+    auto tester = cpd::Tester<sortfunc_t, loginfo_t>({{selectionsort, "SelectionSort"}, {heapsort, "HeapSort"}});
 
+    tester.BatchTests(1, 1, 100);
 
     return 0;
 }
@@ -98,8 +101,9 @@ void heapsort(array_t &array, loginfo_t &loginfo)
         heap_size--;
         heapify(array, 0, heap_size, loginfo);
     }
-    get<0>(loginfo) = trocas;
-    get<1>(loginfo) = comparacoes;
+    
+    get<0>(loginfo) += trocas;
+    get<1>(loginfo) += comparacoes;
 }
 
 // usada no heapsort
@@ -132,22 +136,49 @@ int pai(const array_t &array, element_t elemento)
 // parâmetros: array, índice do elemento a heapificar, tamanho do heap, dicionário de logs
 void heapify(array_t &array, element_t elemento, int heap_size, loginfo_t &loginfo)
 {
-    // a implementar
+    auto e = filho_e(array, elemento);
+    auto d = filho_d(array, elemento);
+    auto maior = elemento;
+    
+    if (e < heap_size && array[e] > array[maior])
+        maior = e;
+
+    if (d < heap_size && array[d] > array[maior])
+        maior = d;
+
+    if (maior != elemento)
+    {
+        swap(array[maior], array[elemento]);
+        heapify(array, maior, heap_size, loginfo);
+    }
 }
 
 int heap_max(array_t &heap, loginfo_t &loginfo)
 {
-    // A implementar!
-    return -1;
+    auto max = heap[0];
+    return max;
 }
 
 int extract_max(array_t &heap, loginfo_t &loginfo)
 {
-    // A implementar!
-    return -1;
+    if (heap.size() < 1)
+        return -1;
+
+    auto max = heap[0];
+    heap[0] = heap[heap.size() - 1];
+    heap.resize(heap.size() - 1);
+    heapify(heap, 0, heap.size(), loginfo);
+    return max;
 }
 
 void heap_insert(array_t &heap, element_t elemento, loginfo_t &loginfo)
 {
-    // A implementar!
+    heap.resize(heap.size() + 1);
+    auto i = heap.size();
+    while (i > 0 && heap[pai(heap, i)] < elemento)
+    {
+        heap[i] = heap[pai(heap, i)];
+        i = pai(heap, i);
+    }
+    heap[i] = elemento;
 }
