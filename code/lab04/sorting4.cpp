@@ -145,31 +145,27 @@ void multi_way_merge(const vector<array_t> arrays, array_t &array_final, loginfo
     array_final.clear();
 
     //multi way merge
-    std::vector<int> Array;
-
-    auto i = 0;
     while (true)
     {
+        auto i = 0;
         for(auto array : arrays)
         {
-            if(i >= array.size())
+            if(array.empty())
             {
+                i++;
                 break;
             }
-            Array.emplace_back(array[i]);
+            array_final.emplace_back(array[0]);
+            array.erase(array.begin());
         }
-        i++;
-        
+
+        if(i == arrays.size())
+        {
+            break;
+        }
     }
 
-    cout << "Array: ";
-    for(auto elem : Array)
-    {
-        cout << elem << " ";
-    }	
-    cout << endl;
-
-    buildheap(Array, loginfo);
+    buildheap(array_final, loginfo);
     // TODO: atualizar loginfo
 }
 
