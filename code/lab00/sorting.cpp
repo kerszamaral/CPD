@@ -20,9 +20,11 @@ void shakesort(array_t array, array_size_t array_size, loginfo_t &loginfo);
 typedef void (*Functions_t)(array_t, array_size_t, loginfo_t &); // Tipo para especificar funções de ordenação
 
 template <>
-void cpd::Tester<Functions_t, loginfo_t>::TestFunction(Functions_t Function, array_t Array, array_size_t ASize, loginfo_t &loginfo)
+void cpd::Tester<Functions_t, loginfo_t>::TestFunction(Functions_t Function, array_t &Array, loginfo_t &loginfo)
 {
-    Function(Array, ASize, loginfo);
+    auto array = Array.data();
+    auto ASize = Array.size();
+    Function(array, ASize, loginfo);
 }
 
 template <>
@@ -40,7 +42,7 @@ main(void)
         {bubblesort, quicksortPoint, shakesort, combsort},
         {"Bubblesort", "Quicksort", "Shakesort", "Combsort"}); // instancia o objeto de teste
 
-    tester.BatchTests(false, RUNS, 100); // executa os testes (automatico, funções de ordenação, tamanho inicial do array
+    tester.BatchTests(1, 1, 100); // executa os testes (automatico, funções de ordenação, tamanho inicial do array
 
     return 0;
 }

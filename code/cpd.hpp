@@ -12,7 +12,7 @@
 namespace cpd
 {
     typedef size_t array_size_t; // Tipo para especificar tamanho do array
-    typedef int *array_t;        // Tipo para especificar formato do array
+    typedef std::vector<int> array_t;        // Tipo para especificar formato do array
 
     class Timer // classe para medir tempo de execução
     {
@@ -51,20 +51,17 @@ namespace cpd
         std::vector<std::string> FuncNames;                                                    // array de nomes das funções de ordenação
 
     private:
-        void testTimer(FuncType sort, array_t A, array_size_t S, LogType &loginfo, Timer &time) // função para testar tempo de execução
+        void testTimer(FuncType sort, array_t &A, LogType &loginfo, Timer &time) // função para testar tempo de execução
         {
             time.Start();                      // inicia timer
-            TestFunction(sort, A, S, loginfo); // executa função de ordenação
+            TestFunction(sort, A, loginfo); // executa função de ordenação
             time.Stop();                       // para timer
         }
 
         void runs(array_size_t Array_Size, int TestType, LogType log[], Timer Timers[])
         {
             std::uniform_int_distribution<> distrib(0, INT_MAX); // cria gerador com distribuição uniforme entre 0 e MAX_INT
-
-            int **array = new int *[Size]; // array dinâmico que armazena os números
-            for (auto i = 0; i < Size; ++i)
-                array[i] = new int[Array_Size]; // aloca espaço para cada função de ordenação
+            std::vector<array_t> array(Size, array_t(Array_Size)); // array dinâmico que armazena os números
 
             // testar com as 3 versões de array (aleatório, crescente e decrescente):
             switch (TestType)
@@ -90,13 +87,13 @@ namespace cpd
                 return;
             }
 
-#pragma omp parallel for
+// #pragma omp parallel for
             for (auto i = 0; i < Size; i++)
-                std::memmove(array[i], array[0], Array_Size * sizeof(int)); // copia array gerado para os outros arrays
+                std::memmove(array[i].data(), array[0].data(), Array_Size * sizeof(int)); // copia array gerado para os outros arrays
 
-#pragma omp parallel for
+// #pragma omp parallel for
             for (auto i = 0; i < Size; i++)
-                testTimer(Functions[i], array[i], Array_Size, log[i], Timers[i]); // executa as funções de ordenação
+                testTimer(Functions[i], array[i], log[i], Timers[i]); // executa as funções de ordenação
 
             if (TestType != 1 && Array_Size <= 100)
             {
@@ -110,9 +107,13 @@ namespace cpd
                 }
             }
 
-            for (auto i = 0; i < Size; i++)
-                delete[] array[i];
-            delete[] array;
+            for (int i = 0; i < Size; i++)
+            {
+                array[i].clear();
+                array[i].shrink_to_fit();
+            }
+            array.clear();
+            array.shrink_to_fit();
         }
 
         void displayStats(std::ostream &output, const std::string &separator, LogType loginfo[], std::string testName, array_size_t S, Timer Timers[])
@@ -258,7 +259,7 @@ namespace cpd
         }
 
         // Define como a função de ordenação deve ser chamada, com os parâmetros necessários
-        void virtual TestFunction(FuncType Function, array_t Array, array_size_t ASize, LogType &loginfo)
+        void virtual TestFunction(FuncType Function, array_t &Array, LogType &loginfo)
         {
             const auto e = std::logic_error("Erro: Funcao TestFunction nao implementada");
             std::cout << e.what() << std::endl;
