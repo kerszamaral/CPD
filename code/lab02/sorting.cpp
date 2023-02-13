@@ -38,11 +38,11 @@ void quicksortIter(array_t array, array_size_t array_size, loginfo_t &loginfo);
 //Implementações para a utilização da biblioteca cpd
 typedef void (*Functions_t)(array_t, array_size_t, loginfo_t &); // Tipo para especificar funções de ordenação
 
-template <>
-void cpd::Tester<Functions_t, loginfo_t>::TestFunction(Functions_t Function, array_t Array, array_size_t ASize, loginfo_t &loginfo)
-{
-    Function(Array, ASize, loginfo); // executa a função de ordenação
-}
+// template <>
+// void cpd::Tester<Functions_t, loginfo_t>::TestFunction(Functions_t Function, array_t Array, array_size_t ASize, loginfo_t &loginfo)
+// {
+//     Function(Array, ASize, loginfo); // executa a função de ordenação
+// }
 
 template <>
 void cpd::Tester<Functions_t, loginfo_t>::DisplayLogNames(std::ostream &Output, const std::string &Separator)

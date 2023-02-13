@@ -13,7 +13,8 @@
                 "-o",
                 "${fileDirname}/${fileBasenameNoExtension}",
                 "-lm",
-                "-I${fileDirname}"
+                "-I${fileDirname}",
+                "-I${cwd}/code/modules/"
             ],
             "options": {
                 "cwd": "${fileDirname}"
@@ -34,7 +35,7 @@
             "args": [
                 "-Wall",
                 "-fdiagnostics-color=always",
-                "-fanalyzer",
+                // "-fanalyzer",
                 "-g",
                 "${fileDirname}\\*.cpp",
                 "-fopenmp",
@@ -42,7 +43,8 @@
                 "${fileDirname}/${fileBasenameNoExtension}.exe",
                 "-lm",
                 "-I${fileDirname}",
-                "-I${cwd}/code/"
+                "-I${cwd}/code/",
+                "-I${cwd}/code/modules/"
             ],
             "options": {
                 "cwd": "${fileDirname}"

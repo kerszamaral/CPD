@@ -27,19 +27,6 @@ void swap(element_t *n1, element_t *n2);
 
 typedef void (*sortfunc_t)(array_t &, loginfo_t &);
 
-template <>
-void cpd::Tester<sortfunc_t, loginfo_t>::TestFunction(sortfunc_t Function, array_t &Array, loginfo_t &loginfo)
-{
-    Function(Array, loginfo); // executa a função de ordenação
-}
-
-template <>
-void cpd::Tester<sortfunc_t, loginfo_t>::DisplayLogNames(std::ostream &Output, const std::string &Separator)
-{
-    Output << Separator << std::setw(Spacer) << "Trocas"
-           << Separator << std::setw(Spacer) << "Comparacoes"; // exibe os nomes das métricas de log
-}
-
 int main(void)
 {
     auto tester = cpd::Tester<sortfunc_t, loginfo_t>({{selectionsort, "SelectionSort"}, {heapsort, "HeapSort"}});

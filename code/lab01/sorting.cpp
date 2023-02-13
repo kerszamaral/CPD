@@ -19,7 +19,7 @@ cada vez aumentando em 10 vezes o numero de numeros.
 #include <iostream>
 #include <tuple>
 #include <random>
-#include <bits/stdc++.h>
+// #include <bits/stdc++.h>
 
 // TODO: executar várias vezes os algoritmos, com tamanhos diferentes (e.g., 100, 1000 e 10000)
 //! DONE
