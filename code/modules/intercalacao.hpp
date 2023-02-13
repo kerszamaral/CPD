@@ -8,56 +8,35 @@ namespace sort
     private:
         static void intercala(int array[], int left, int mid, int right, loginfo_t &loginfo)
         {
-            auto const subArrayOne = mid - left + 1;
-            auto const subArrayTwo = right - mid;
+            int i = left, j = mid, k = 0, qtelem = right - left;
+            int *aux = (int *)malloc((qtelem) * sizeof(int));
 
-            // Create temp arrays
-            auto *leftArray = new int[subArrayOne],
-                 *rightArray = new int[subArrayTwo];
-
-            // Copy data to temp arrays leftArray[] and rightArray[]
-            for (auto i = 0; i < subArrayOne; i++)
-                leftArray[i] = array[left + i];
-            for (auto j = 0; j < subArrayTwo; j++)
-                rightArray[j] = array[mid + 1 + j];
-
-            auto indexOfSubArrayOne = 0,   // Initial index of first sub-array
-                indexOfSubArrayTwo = 0;    // Initial index of second sub-array
-            int indexOfMergedArray = left; // Initial index of merged array
-
-            // Merge the temp arrays back into array[left..right]
-            while (indexOfSubArrayOne < subArrayOne && indexOfSubArrayTwo < subArrayTwo)
+            while (i < mid && j < right)
             {
-                if (leftArray[indexOfSubArrayOne] <= rightArray[indexOfSubArrayTwo])
+                if (array[i] <= array[j])
                 {
-                    array[indexOfMergedArray] = leftArray[indexOfSubArrayOne];
-                    indexOfSubArrayOne++;
+                    aux[k++] = array[i++];
                 }
                 else
                 {
-                    array[indexOfMergedArray] = rightArray[indexOfSubArrayTwo];
-                    indexOfSubArrayTwo++;
+                    aux[k++] = array[j++];
                 }
-                indexOfMergedArray++;
             }
-            // Copy the remaining elements of
-            // left[], if there are any
-            while (indexOfSubArrayOne < subArrayOne)
+
+            while (i < mid)
             {
-                array[indexOfMergedArray] = leftArray[indexOfSubArrayOne];
-                indexOfSubArrayOne++;
-                indexOfMergedArray++;
+                aux[k++] = array[i++];
             }
-            // Copy the remaining elements of
-            // right[], if there are any
-            while (indexOfSubArrayTwo < subArrayTwo)
+
+            while (j < right)
             {
-                array[indexOfMergedArray] = rightArray[indexOfSubArrayTwo];
-                indexOfSubArrayTwo++;
-                indexOfMergedArray++;
+                aux[k++] = array[j++];
             }
-            delete[] leftArray;
-            delete[] rightArray;
+
+            // copia do vetor auxiliar para o original
+            memcpy((void *)&array[left], (void *)aux, qtelem * sizeof(int));
+
+            free(aux);
         }
 
         static void mergeSort(array_t &array, int const begin, int const end, loginfo_t &loginfo)
@@ -65,9 +44,9 @@ namespace sort
             if (begin >= end)
                 return; // Returns recursively
 
-            auto mid = begin + (end - begin) / 2;
+            auto mid = (begin - end) / 2;
             mergeSort(array, begin, mid, loginfo);
-            mergeSort(array, mid + 1, end, loginfo);
+            mergeSort(array, mid, end, loginfo);
             intercala(array.data(), begin, mid, end, loginfo);
         }
 
