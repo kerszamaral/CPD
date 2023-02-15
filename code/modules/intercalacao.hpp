@@ -1,5 +1,6 @@
 #pragma once
 #include "common.hpp"
+#include <limits.h>
 
 namespace sort
 {
@@ -50,6 +51,40 @@ namespace sort
             intercala(array.data(), begin, mid, end, loginfo);
         }
 
+        inline const static element_t filho_e(element_t elemento) { return elemento * 2 + 1; }
+
+        inline const static element_t filho_d(element_t elemento) { return elemento * 2 + 2; }
+
+        inline const static element_t pai(element_t elemento) { return (elemento / 2); }
+
+        typedef std::pair<int, int> heap_element_t;
+
+        static void heapifyMin(std::vector<heap_element_t> &array, element_t elemento, int heap_size, loginfo_t &loginfo)
+        {
+            auto e = filho_e(elemento);
+            auto d = filho_d(elemento);
+            auto menor = elemento;
+
+            if (e < heap_size && std::get<0>(array[e]) < std::get<0>(array[menor]))
+                menor = e;
+
+            if (d < heap_size && std::get<0>(array[d]) < std::get<0>(array[menor]))
+                menor = d;
+
+            if (menor != elemento)
+            {
+                std::swap(array[menor], array[elemento]);
+                heapifyMin(array, menor, heap_size, loginfo);
+            }
+        }
+
+        static void buildheapMin(std::vector<heap_element_t> &array, loginfo_t &loginfo)
+        {
+            int ultimo_pai = (array.size() / 2) - 1;         // ultimo pai
+            for (auto i = ultimo_pai; i >= 0; i--)           // percorre os pais
+                heapifyMin(array, i, array.size(), loginfo); // transforma o pai em heap
+        }
+
     public:
         static void merge(const array_t &array1, const array_t &array2, array_t &array_final, loginfo_t &loginfo)
         {
@@ -93,30 +128,52 @@ namespace sort
 
         static void multi_way_merge(const std::vector<array_t> arrays, array_t &array_final, loginfo_t &loginfo)
         {
-            array_final.clear();
+            array_final.clear(); // limpa o array final
+
+            // Cria um heap para fazer a intercalacao, com uma tupla de <valor, posicao, array>
+            std::vector<heap_element_t> heap(arrays.size(), std::make_pair(-1, -1));
+            std::vector<int> indexes(arrays.size(), 0); // vetor de indices
 
             // multi way merge
             while (true)
             {
-                long long unsigned int i = 0;
-                for (auto array : arrays)
+                size_t j = 0; // contador de arrays vazios
+
+                for (size_t i = 0; i < arrays.size(); i++)
                 {
-                    if (array.empty())
+                    auto value = INT_MAX;
+                    if (indexes[i] == -1) // se o array estiver vazio
                     {
-                        i++;
-                        break;
+                        j++; // incrementa o contador de arrays vazios
                     }
-                    array_final.emplace_back(array[0]);
-                    array.erase(array.begin());
+                    else
+                    {
+                        value = arrays[i][indexes[i]];
+                    }
+
+                    heap[i] = std::make_pair(value, i); // insere o valor no heap
                 }
 
-                if (i == arrays.size())
+                if (j == arrays.size()) // se todos os arrays estiverem vazios
                 {
-                    break;
+                    break; // sai do loop
+                }
+
+                buildheapMin(heap, loginfo); // constroi o heap
+
+                auto &orgArray = heap[0].second; // pega o array original
+
+                array_final.emplace_back(heap[0].first); // insere o menor valor no array final
+
+                if (indexes[orgArray] == (int)arrays[orgArray].size() - 1)
+                {
+                    indexes[orgArray] = -1; // marca o array como vazio
+                }
+                else
+                {
+                    indexes[orgArray]++; // incrementa a posicao do array
                 }
             }
-
-            heap::buildheap(array_final, loginfo);
             // TODO: atualizar loginfo
         }
 
