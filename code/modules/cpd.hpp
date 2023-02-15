@@ -5,3 +5,4 @@
 #include "selecao.hpp"
 #include "tester.hpp"
 #include "trocas.hpp"
+#include "linear.hpp"

@@ -11,10 +11,10 @@
 namespace sort
 {
     // Definições e variáveis globais necessárias
-    typedef int element_t;                          // tipo do elemento
-    typedef size_t array_size_t;                    // tipo do tamanho do array
-    typedef std::vector<element_t> array_t;         // Tipo para especificar formato do array
-    typedef std::tuple<size_t, size_t> loginfo_t; // armazena informações de desempenho <trocas, comparações, tempo em ms>
+    typedef int element_t;                        // tipo do elemento
+    typedef size_t array_size_t;                  // tipo do tamanho do array
+    typedef std::vector<element_t> array_t;       // Tipo para especificar formato do array
+    typedef std::tuple<size_t, size_t> loginfo_t; // armazena informações de desempenho <trocas, comparações>
     typedef void (*sortfunc_t)(array_t &, loginfo_t &);
 
     static void swap(element_t *n1, element_t *n2)
@@ -32,7 +32,7 @@ namespace sort
         inline const static element_t filho_d(const array_t &array, element_t elemento) { return elemento * 2 + 2; }
 
         inline const static element_t pai(const array_t &array, element_t elemento) { return (elemento / 2); }
-        
+
         inline const static element_t heap_max(const array_t &array, loginfo_t &loginfo) { return array[0]; }
 
         // heapify: verifica se o elemento na posição passada é um heap e se não for transforma-o em um
@@ -42,14 +42,17 @@ namespace sort
             auto d = filho_d(array, elemento);
             auto maior = elemento;
 
+            std::get<1>(loginfo)++;
             if (e < heap_size && array[e] > array[maior])
                 maior = e;
 
+            std::get<1>(loginfo)++;
             if (d < heap_size && array[d] > array[maior])
                 maior = d;
 
             if (maior != elemento)
             {
+                std::get<0>(loginfo)++;
                 swap(&array[maior], &array[elemento]);
                 heapify(array, maior, heap_size, loginfo);
             }
@@ -80,6 +83,8 @@ namespace sort
             auto i = array.size();
             while (i > 0 && array[pai(array, i)] < elemento)
             {
+                std::get<0>(loginfo)++;
+                std::get<1>(loginfo)++;
                 array[i] = array[pai(array, i)];
                 i = pai(array, i);
             }

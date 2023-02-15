@@ -2,6 +2,7 @@
 #include "common.hpp"
 #include <limits.h>
 
+
 namespace sort
 {
     class Intercalacao
@@ -9,35 +10,49 @@ namespace sort
     private:
         static void intercala(int array[], int left, int mid, int right, loginfo_t &loginfo)
         {
-            int i = left, j = mid, k = 0, qtelem = right - left;
-            int *aux = (int *)malloc((qtelem) * sizeof(int));
+            auto const subArrayOne = mid - left + 1;
+            auto const subArrayTwo = right - mid;
 
-            while (i < mid && j < right)
+            // Create temp arrays
+            auto *leftArray = new int[subArrayOne],
+                 *rightArray = new int[subArrayTwo];
+
+            // Copy data to temp arrays leftArray[] and rightArray[]
+            memcpy(leftArray, array + left, subArrayOne * sizeof(int));
+            memcpy(rightArray, array + mid + 1, subArrayTwo * sizeof(int));
+
+            auto indexOfSubArrayOne = 0,   // Initial index of first sub-array
+                indexOfSubArrayTwo = 0;    // Initial index of second sub-array
+            int indexOfMergedArray = left; // Initial index of merged array
+
+            // Merge the temp arrays back into array[left..right]
+            while (indexOfSubArrayOne < subArrayOne && indexOfSubArrayTwo < subArrayTwo)
             {
-                if (array[i] <= array[j])
+                std::get<1>(loginfo)++; // comparações
+                if (leftArray[indexOfSubArrayOne] <= rightArray[indexOfSubArrayTwo])
                 {
-                    aux[k++] = array[i++];
+                    array[indexOfMergedArray++] = leftArray[indexOfSubArrayOne++];
                 }
                 else
                 {
-                    aux[k++] = array[j++];
+                    std::get<0>(loginfo)++; // trocas
+                    array[indexOfMergedArray++] = rightArray[indexOfSubArrayTwo++];
                 }
             }
-
-            while (i < mid)
+            // Copy the remaining elements of
+            // left[], if there are any
+            while (indexOfSubArrayOne < subArrayOne)
             {
-                aux[k++] = array[i++];
+                array[indexOfMergedArray++] = leftArray[indexOfSubArrayOne++];
             }
-
-            while (j < right)
+            // Copy the remaining elements of
+            // right[], if there are any
+            while (indexOfSubArrayTwo < subArrayTwo)
             {
-                aux[k++] = array[j++];
+                array[indexOfMergedArray++] = rightArray[indexOfSubArrayTwo++];
             }
-
-            // copia do vetor auxiliar para o original
-            memcpy((void *)&array[left], (void *)aux, qtelem * sizeof(int));
-
-            free(aux);
+            delete[] leftArray;
+            delete[] rightArray;
         }
 
         static void mergeSort(array_t &array, int const begin, int const end, loginfo_t &loginfo)
@@ -45,9 +60,9 @@ namespace sort
             if (begin >= end)
                 return; // Returns recursively
 
-            auto mid = (begin - end) / 2;
+            auto mid = begin + (end - begin) / 2;
             mergeSort(array, begin, mid, loginfo);
-            mergeSort(array, mid, end, loginfo);
+            mergeSort(array, mid + 1, end, loginfo);
             intercala(array.data(), begin, mid, end, loginfo);
         }
 
@@ -65,14 +80,17 @@ namespace sort
             auto d = filho_d(elemento);
             auto menor = elemento;
 
+            std::get<1>(loginfo)++; // comparações
             if (e < heap_size && std::get<0>(array[e]) < std::get<0>(array[menor]))
                 menor = e;
 
+            std::get<1>(loginfo)++; // comparações
             if (d < heap_size && std::get<0>(array[d]) < std::get<0>(array[menor]))
                 menor = d;
 
             if (menor != elemento)
             {
+                std::get<0>(loginfo)++; // trocas
                 std::swap(array[menor], array[elemento]);
                 heapifyMin(array, menor, heap_size, loginfo);
             }

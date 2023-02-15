@@ -34,7 +34,7 @@ namespace sort
     public:
         static void insertionsort(array_t &array, loginfo_t &loginfo)
         {
-            for (long long unsigned int i = 1; i < array.size(); i++)
+            for (size_t i = 1; i < array.size(); i++)
             {                          // do segundo ao último
                 auto chave = array[i]; // chave a inserir no subarray ordenado
                 auto j = i - 1;        // último elemento do subarray ordenado
@@ -46,19 +46,16 @@ namespace sort
                     j = j - 1;
                     std::get<0>(loginfo)++;
                 }
-                if (j + 1 != i)
-                {
-                    array[j + 1] = chave;
-                    std::get<0>(loginfo)++;
-                }
+                array[j + 1] = chave;
+                std::get<0>(loginfo)++;
             }
         }
 
         static void insertionsortBinary(array_t &array, loginfo_t &loginfo)
         {
-            for (long long unsigned int i = 1; i < array.size(); ++i)
+            for (size_t i = 1; i < array.size(); ++i)
             {
-                long long unsigned int j = i - 1;
+                size_t j = i - 1;
                 int elemento = array[i];
                 int local = busca_binaria(array, elemento, 0, j, loginfo);
                 std::get<0>(loginfo)++;
@@ -69,17 +66,14 @@ namespace sort
                     array[j + 1] = array[j];
                     j--;
                 }
-                if (j + 1 != i)
-                {
-                    array[j + 1] = elemento;
-                    std::get<0>(loginfo)++;
-                }
+                array[j + 1] = elemento;
+                std::get<0>(loginfo)++;
             }
         }
 
         static void shellsort(array_t &array, loginfo_t &loginfo)
         {
-            long long unsigned int i, j; 
+            long long unsigned int i, j;
             long long unsigned int espaco = 1;
             int valor;
 

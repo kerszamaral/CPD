@@ -81,13 +81,13 @@ namespace cpd
                 return;
             }
 
-// #pragma omp parallel for
+#pragma omp parallel for
             for (auto i = 0; i < Size; i++)
             {
                 std::memmove(array[i].data(), array[0].data(), Array_Size * sizeof(int)); // copia array gerado para os outros arrays
             }
 
-// #pragma omp parallel for
+#pragma omp parallel for
             for (auto i = 0; i < Size; i++)
             {
                 testTimer(Functions[i], array[i], log[i], Timers[i]); // executa as funções de ordenação
