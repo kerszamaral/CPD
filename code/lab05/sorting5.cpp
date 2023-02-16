@@ -1,28 +1,5 @@
 #include "cpd.hpp"
 
-/*
-*I) Análise de desempenho de heapsort //!Okay
-Faça uma análise de desempenho do heapsort sendo aplicado em arrays de tamanho 100, 1000 e 10000, tanto crescentes quanto decrescentes (verifique a quantidade de trocas, a de comparações e o tempo de processamento).
-Nota máxima1
-*II) Implementação de two_way_merge //!Okay
-Implementar two_way_merge (que compara 2 a 2, mesmo que receba uma lista de vários arrays)
-Nota máxima1
-*II) Implementação de multi_way_merge //!Okay
-Implementar multi_way_merge (que recebe vários arrays e compara todos ao mesmo tempo, usando como base uma estrutura auxiliar do tipo min-heap.
-Nota máxima1.5
-*II) Implementação do merge_sort //!Okay
-Implementar merge_sort.
-Nota máxima1
-*III) Avaliação do desempenho do mergesort em arrays de tamanho 100, 1000 e 10000, tanto crescentes quanto decrescentes (verifique a quantidade de trocas, a de comparações e o tempo de processamento.
-Nota máxima1 //!Okay
-*IV) Implementação do RADIX-sort LSD //!Okay
-Nota máxima0.5
-*IV) Implementação do RADIX-sort MSD //!IDK
-Nota máxima0.5
-*IV) Implementação do CountingSort //!Okay
-Nota máxima0.5
-*/
-
 using namespace std;
 
 void resetStats(sort::loginfo_t &loginfo)
@@ -51,6 +28,7 @@ int main(void)
         {sort::Linear::countingsort, "CountingSort"}
     });
     tester.BatchTests(0, 3, 100);
+    // Para estes testes, a funcao de numeros aleatorio foi desabilidata, igualmente a de numeros iguais.
 
     cout << endl;
 
