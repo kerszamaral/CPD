@@ -49,7 +49,7 @@ namespace sort
             // Get maximum element
             int max = getMax(array);
             int start;
-            for (start = 1; start < max; start *=10)
+            for (start = 1; start < max; start *= 10)
             {
             }
 
@@ -72,10 +72,10 @@ namespace sort
 
         static void countingSort(array_t &array)
         {
-            array_t ordered;
-            ordered.resize(array.size());
+            array_t ordered(array.size());
+            int max = getMax(array);
 
-            std::vector<int> count(getMax(array) + 1, 0);
+            std::vector<int> count(max + 1, 0);
             for (size_t i = 0; i < array.size(); i++)
             {
                 count[array[i]]++;
@@ -84,12 +84,14 @@ namespace sort
             {
                 count[i] += count[i - 1];
             }
-            for (size_t i = array.size() - 1; i >= 0; i--)
+            for (int i = array.size() - 1; i >= 0; i--)
             {
                 ordered[count[array[i]] - 1] = array[i];
                 count[array[i]]--;
             }
-            array = ordered;
+
+            for (size_t i = 0; i < array.size(); i++)
+                array[i] = ordered[i];
         }
 
     public:

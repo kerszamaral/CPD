@@ -113,6 +113,7 @@ namespace sort
             array_final.clear();
             while (i < qtd_a1 && j < qtd_a2)
             {
+                std::get<1>(loginfo)++; // comparações
                 if (array1[i] <= array2[j])
                     array_final.push_back(array1[i++]);
                 else
@@ -141,7 +142,6 @@ namespace sort
                 merge(array1, array2, array_final_temp, loginfo);
                 array_final = array_final_temp;
             }
-            // TODO: atualizar loginfo
         }
 
         static void multi_way_merge(const std::vector<array_t> arrays, array_t &array_final, loginfo_t &loginfo)
@@ -192,7 +192,6 @@ namespace sort
                     indexes[orgArray]++; // incrementa a posicao do array
                 }
             }
-            // TODO: atualizar loginfo
         }
 
         static void mergesort(array_t &array, loginfo_t &loginfo)

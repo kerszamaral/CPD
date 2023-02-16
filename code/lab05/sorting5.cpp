@@ -4,10 +4,10 @@
 *I) Análise de desempenho de heapsort //!Okay
 Faça uma análise de desempenho do heapsort sendo aplicado em arrays de tamanho 100, 1000 e 10000, tanto crescentes quanto decrescentes (verifique a quantidade de trocas, a de comparações e o tempo de processamento).
 Nota máxima1
-*II) Implementação de two_way_merge
+*II) Implementação de two_way_merge //!Okay
 Implementar two_way_merge (que compara 2 a 2, mesmo que receba uma lista de vários arrays)
 Nota máxima1
-*II) Implementação de multi_way_merge
+*II) Implementação de multi_way_merge //!Okay
 Implementar multi_way_merge (que recebe vários arrays e compara todos ao mesmo tempo, usando como base uma estrutura auxiliar do tipo min-heap.
 Nota máxima1.5
 *II) Implementação do merge_sort //!Okay
@@ -17,9 +17,9 @@ Nota máxima1
 Nota máxima1 //!Okay
 *IV) Implementação do RADIX-sort LSD //!Okay
 Nota máxima0.5
-*IV) Implementação do RADIX-sort MSD
+*IV) Implementação do RADIX-sort MSD //!IDK
 Nota máxima0.5
-*IV) Implementação do CountingSort
+*IV) Implementação do CountingSort //!Okay
 Nota máxima0.5
 */
 
@@ -47,10 +47,10 @@ int main(void)
         {sort::Selecao::heapsort, "HeapSort"},
         {sort::Intercalacao::mergesort, "MergeSort"},
         {sort::Linear::radixsortLSD, "RadixSortLSD"},
-        // {sort::Linear::radixsortMSD, "RadixSortMSD"},
-        // {sort::Linear::countingsort, "CountingSort"}
+        {sort::Linear::radixsortMSD, "RadixSortMSD"},
+        {sort::Linear::countingsort, "CountingSort"}
     });
-    tester.BatchTests(1, 3, 100);
+    tester.BatchTests(0, 3, 100);
 
     cout << endl;
 
