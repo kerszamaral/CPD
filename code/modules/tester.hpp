@@ -64,10 +64,10 @@ namespace cpd
                 for (size_t i = 0; i < Array_Size; i++)
                     array[0][i] = i + 1; // gera números em ordem crescente
                 break;
-            case 1:
-                for (size_t i = 0; i < Array_Size; i++)
-                    array[0][i] = distrib(Tester::rng); // gera números aleatórios para o array
-                break;
+            // case 1:
+            //     for (size_t i = 0; i < Array_Size; i++)
+            //         array[0][i] = distrib(Tester::rng); // gera números aleatórios para o array
+            //     break;
             case 2:
                 for (size_t i = 0; i < Array_Size; i++)
                     array[0][i] = Array_Size - i; // gera números em ordem decrescente
